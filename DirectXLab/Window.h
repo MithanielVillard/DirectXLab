@@ -16,7 +16,6 @@ public:
 	static constexpr DXGI_FORMAT sDepthStencilFormat{ DXGI_FORMAT_D24_UNORM_S8_UINT };
 
 protected:
-	ID3D12CommandQueue* mCommandQueue;
 	ID3D12GraphicsCommandList* mCommandList;
 	ID3D12CommandAllocator* mCommandAllocator;
 
@@ -44,9 +43,8 @@ protected:
 	int mHeight;
 
 protected:
-	void FlushCommandQueue();
 	void OpenCommandList() const;
-	void ExecuteCommandList();
+	void ExecuteCommandList() const;
 	ID3D12Resource* GetCurrentBackBuffer() const { return mSwapChainBuffers[mCurrentBackBuffer]; }
 
 private:

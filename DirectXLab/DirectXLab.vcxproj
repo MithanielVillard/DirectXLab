@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="D12DebugLayer.h" />
     <ClInclude Include="D12PipelineObject.h" />
+    <ClInclude Include="d3dx12.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RenderWindow.h" />
