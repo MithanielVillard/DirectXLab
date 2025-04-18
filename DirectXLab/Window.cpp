@@ -34,17 +34,35 @@ Window::~Window()
 
 	mSCBuffersHeap->Release();
 	mDSHeap->Release();
+
+	DestroyWindow(mWindowHandle);
+	UnregisterClassW(reinterpret_cast<LPCWSTR>(mWindowClass), mHInstance);
 }
 
-LRESULT Window::MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Window::MainWndProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam)
 {
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT Window::SubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass,
+LRESULT Window::SubclassProc(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam, UINT_PTR uIdSubclass,
 	DWORD_PTR dwRefData)
 {
 	return reinterpret_cast<Window*>(dwRefData)->HandleEvent(hWnd, uMsg, wParam, lParam);
+}
+
+void Window::OpenCommandList() const
+{
+	mCommandAllocator->Reset();
+	mCommandList->Reset(mCommandAllocator, nullptr);
+}
+
+void Window::ExecuteCommandList()
+{
+	mCommandList->Close();
+	ID3D12CommandList* cmdsLists[] = { mCommandList };
+	mCommandQueue->ExecuteCommandLists(1, cmdsLists);
+
+	FlushCommandQueue();
 }
 
 LRESULT Window::HandleEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -81,7 +99,7 @@ void Window::ResizeViewport()
 	mScissorRect.bottom = mHeight;
 }
 
-void Window::ResizeWindow(float const newWidth, float const newHeight)
+void Window::ResizeWindow(int const newWidth, int const newHeight)
 {
 	ReleaseDepthStencilBuffer();
 	ReleaseSwapChainBuffers();
@@ -109,7 +127,8 @@ bool Window::CreateWindowClass(std::wstring_view title, int width, int height)
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = L"MainWnd";
 
-	if (!RegisterClass(&wc))
+	mWindowClass = RegisterClass(&wc);
+	if (!mWindowClass)
 	{
 		PRINT_DEBUG("RegisterClass Failed !")
 			return false;
