@@ -125,7 +125,7 @@ bool Window::CreateWindowClass(std::wstring_view title, int width, int height)
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = L"MainWnd";
+	wc.lpszClassName = title.data();
 
 	mWindowClass = RegisterClass(&wc);
 	if (!mWindowClass)
@@ -134,7 +134,7 @@ bool Window::CreateWindowClass(std::wstring_view title, int width, int height)
 			return false;
 	}
 
-	mWindowHandle = CreateWindow(L"MainWnd", title.data(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width,
+	mWindowHandle = CreateWindow(title.data(), title.data(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width,
 		height, 0, 0, mHInstance, 0);
 	if (!mWindowHandle)
 	{

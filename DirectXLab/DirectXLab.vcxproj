@@ -133,16 +133,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="D12DebugLayer.h" />
+    <ClInclude Include="D12PipelineObject.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RenderWindow.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D12DebugLayer.cpp" />
+    <ClCompile Include="D12PipelineObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

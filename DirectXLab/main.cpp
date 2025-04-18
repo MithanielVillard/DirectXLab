@@ -11,6 +11,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	while (window.IsOpen())
 	{
 		window.Update();
+
 		window.BeginFrame();
 		window.EndFrame();
 	}

@@ -33,6 +33,12 @@
     <ClInclude Include="RenderWindow.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="D12PipelineObject.h">
+      <Filter>Wrappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -49,6 +55,12 @@
     </ClCompile>
     <ClCompile Include="RenderWindow.cpp">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="D12PipelineObject.cpp">
+      <Filter>Wrappers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

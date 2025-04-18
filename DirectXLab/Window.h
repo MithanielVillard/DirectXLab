@@ -12,6 +12,9 @@ public:
 	int GetHeight() const { return mHeight; }
 	float AspectRatio() const { return static_cast<float>(mWidth) / static_cast<float>(mHeight); }
 
+	static constexpr DXGI_FORMAT sBackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
+	static constexpr DXGI_FORMAT sDepthStencilFormat{ DXGI_FORMAT_D24_UNORM_S8_UINT };
+
 protected:
 	ID3D12CommandQueue* mCommandQueue;
 	ID3D12GraphicsCommandList* mCommandList;
@@ -39,9 +42,6 @@ protected:
 	bool mIsOpen;
 	int mWidth;
 	int mHeight;
-
-	static constexpr DXGI_FORMAT sBackBufferFormat { DXGI_FORMAT_R8G8B8A8_UNORM };
-	static constexpr DXGI_FORMAT sDepthStencilFormat { DXGI_FORMAT_D24_UNORM_S8_UINT };
 
 protected:
 	void FlushCommandQueue();
