@@ -27,6 +27,12 @@
     <ClInclude Include="D12DebugLayer.h">
       <Filter>Wrappers</Filter>
     </ClInclude>
+    <ClInclude Include="RenderContext.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -34,6 +40,12 @@
     </ClCompile>
     <ClCompile Include="D12DebugLayer.cpp">
       <Filter>Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderContext.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

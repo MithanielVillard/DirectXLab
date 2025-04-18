@@ -1,6 +1,7 @@
 #pragma once
 class D12DebugLayer
 {
+public:
 	D12DebugLayer();
 	~D12DebugLayer();
 

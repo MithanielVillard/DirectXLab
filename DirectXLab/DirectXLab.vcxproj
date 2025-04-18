@@ -132,13 +132,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\DirextX12Minimal\d3dx12.h" />
     <ClInclude Include="D12DebugLayer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D12DebugLayer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

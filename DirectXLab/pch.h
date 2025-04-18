@@ -30,6 +30,15 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Comctl32.lib")
 
+// == Typedefs ==
+#undef byte
+
+using byte = unsigned __int8;
+
+using ushort = unsigned __int16;
+using uint = unsigned __int32;
+using ulong = unsigned __int64;
+
 // == Macros ==
 #define NOMINMAX
 
