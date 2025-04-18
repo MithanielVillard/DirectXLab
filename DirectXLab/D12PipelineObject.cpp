@@ -7,7 +7,12 @@
 
 D12PipelineObject::D12PipelineObject(Shader const& VS, Shader const& PS, Shader const& rootsig)
 {
-	RenderContext::GetDevice()->CreateRootSignature(0, rootsig.GetData(), rootsig.GetSize(), IID_PPV_ARGS(&mRootSignature));
+	HRESULT res = RenderContext::GetDevice()->CreateRootSignature(0, rootsig.GetData(), rootsig.GetSize(), IID_PPV_ARGS(&mRootSignature));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to create root signature", res);
+		return;
+	}
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = mRootSignature;
@@ -21,11 +26,16 @@ D12PipelineObject::D12PipelineObject(Shader const& VS, Shader const& PS, Shader 
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.NumRenderTargets = 1;
 	psoDesc.SampleDesc.Count = 1;
-	psoDesc.SampleDesc.Quality = 1;
+	psoDesc.SampleDesc.Quality = 0;
 	psoDesc.RTVFormats[0] = Window::sBackBufferFormat;
 	psoDesc.DSVFormat = Window::sDepthStencilFormat;
 
-	RenderContext::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState));
+	res = RenderContext::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to create pipeline state object", res);
+		return;
+	}
 }
 
 D12PipelineObject::~D12PipelineObject()

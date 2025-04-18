@@ -39,6 +39,9 @@
     <ClInclude Include="D12PipelineObject.h">
       <Filter>Wrappers</Filter>
     </ClInclude>
+    <ClInclude Include="StaticBuffer.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -62,5 +65,24 @@
     <ClCompile Include="D12PipelineObject.cpp">
       <Filter>Wrappers</Filter>
     </ClCompile>
+    <ClCompile Include="StaticBuffer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="RootSignature.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Common.hlsli">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
   </ItemGroup>
 </Project>
