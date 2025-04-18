@@ -2,9 +2,13 @@
 class StaticBuffer
 {
 public:
-	StaticBuffer(void const* initData, ulong initDataSize);
+	StaticBuffer() = default;
 	~StaticBuffer();
 
+	void Init(void const* initData, ulong initDataSize);
+	void SetName(std::wstring_view name) const { mDefaultBuffer->SetName(name.data()); }
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const { return mDefaultBuffer->GetGPUVirtualAddress(); }
 private:
 	ID3D12Resource* mDefaultBuffer;
 	ID3D12Resource* mUploadBuffer;

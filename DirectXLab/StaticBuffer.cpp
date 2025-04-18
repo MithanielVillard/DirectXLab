@@ -3,7 +3,7 @@
 
 #include "RenderContext.h"
 
-StaticBuffer::StaticBuffer(void const* initData, ulong initDataSize)
+void StaticBuffer::Init(void const* initData, ulong initDataSize)
 {
     CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(initDataSize);
@@ -29,6 +29,8 @@ StaticBuffer::StaticBuffer(void const* initData, ulong initDataSize)
     mSubResourceData.pData = initData;
     mSubResourceData.RowPitch = initDataSize;
     mSubResourceData.SlicePitch = mSubResourceData.RowPitch;
+
+    RenderContext::UploadBuffer(*this);
 }
 
 StaticBuffer::~StaticBuffer()

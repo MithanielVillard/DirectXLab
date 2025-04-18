@@ -123,9 +123,10 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -135,16 +136,23 @@
     <ClInclude Include="D12DebugLayer.h" />
     <ClInclude Include="D12PipelineObject.h" />
     <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="DynamicBuffer.h" />
+    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="GeometryFactory.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticBuffer.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D12DebugLayer.cpp" />
     <ClCompile Include="D12PipelineObject.cpp" />
+    <ClCompile Include="DynamicBuffer.cpp" />
+    <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="GeometryFactory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="RenderWindow.cpp" />

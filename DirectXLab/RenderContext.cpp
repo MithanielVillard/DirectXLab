@@ -54,6 +54,8 @@ bool RenderContext::Init()
 		return false;
 	}
 
+	context.mCommandList->Close();
+
 	context.sRtvDescriptorSize = context.mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	context.sDsvDescriptorSize = context.mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	context.sCbvSrvUavDescriptorSize = context.mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -84,8 +86,7 @@ void RenderContext::UploadBuffer(StaticBuffer& buffer)
 	RenderContext& context = Instance();
 
 	context.mCommandAllocator->Reset();
-	context.mCommandList->Release();
-
+	context.mCommandList->Reset(context.mCommandAllocator, nullptr);
 
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(buffer.mDefaultBuffer, D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
 	context.mCommandList->ResourceBarrier(1, &barrier);
