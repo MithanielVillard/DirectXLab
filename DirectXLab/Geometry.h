@@ -10,6 +10,7 @@ public:
 
 	D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() { return mVertexBufferView; }
 	D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() { return mIndexBufferView; }
+	uint GetIndicesCount() const { return mIndicesCount; }
 
 	static constexpr DXGI_FORMAT sIndexFormat{ DXGI_FORMAT_R16_UINT };
 
@@ -19,5 +20,7 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW mVertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW mIndexBufferView;
+
+	uint mIndicesCount;
 };
 

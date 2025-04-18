@@ -102,6 +102,7 @@ void RenderContext::UploadBuffer(StaticBuffer& buffer)
 
 	FlushCommandQueue();
 	buffer.mUploadBuffer->Release();
+	buffer.mUploadBuffer = nullptr;
 }
 
 RenderContext::~RenderContext()

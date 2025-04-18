@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="D12DebugLayer.h" />
     <ClInclude Include="D12PipelineObject.h" />
     <ClInclude Include="d3dx12.h" />
@@ -144,10 +145,12 @@
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticBuffer.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D12DebugLayer.cpp" />
     <ClCompile Include="D12PipelineObject.cpp" />
     <ClCompile Include="DynamicBuffer.cpp" />
@@ -158,6 +161,7 @@
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="StaticBuffer.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>

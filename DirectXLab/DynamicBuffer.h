@@ -7,7 +7,9 @@ public:
 
 	template <typename T>
 	void CopyData(T& data);
-	void SetName(std::wstring_view name) { mBuffer->SetName(name.data()); }
+	void SetName(std::wstring_view name) const { mBuffer->SetName(name.data()); }
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const { return mBuffer->GetGPUVirtualAddress(); }
 
 private:
 	ID3D12Resource* mBuffer;

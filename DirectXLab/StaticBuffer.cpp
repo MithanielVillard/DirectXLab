@@ -36,5 +36,4 @@ void StaticBuffer::Init(void const* initData, ulong initDataSize)
 StaticBuffer::~StaticBuffer()
 {
 	mDefaultBuffer->Release();
-    if (mUploadBuffer) mUploadBuffer->Release();
 }

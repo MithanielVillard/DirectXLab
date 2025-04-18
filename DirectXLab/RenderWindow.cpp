@@ -1,11 +1,17 @@
 #include "pch.h"
 #include "RenderWindow.h"
 
+#include "Camera.h"
+#include "D12PipelineObject.h"
+#include "Geometry.h"
 #include "RenderContext.h"
+#include "Transform.h"
 
-void RenderWindow::BeginFrame()
+void RenderWindow::BeginFrame(const Camera& camera)
 {
 	OpenCommandList();
+
+	mpCamera = &camera;
 
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	mCommandList->ResourceBarrier(1, &barrier);
@@ -20,6 +26,24 @@ void RenderWindow::BeginFrame()
 
 	mCommandList->ClearRenderTargetView(currentBackBufferView, DirectX::Colors::LightSteelBlue, 0, nullptr);
 	mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+}
+
+void RenderWindow::Draw(Geometry& geo, const D12PipelineObject& pso, const Transform& transform)
+{
+	mCommandList->SetGraphicsRootSignature(pso.mRootSignature);
+	mCommandList->SetPipelineState(pso.mPipelineState);
+
+	mCommandList->SetGraphicsRootConstantBufferView(0, transform.mBuffer.GetGPUAddress());
+	mCommandList->SetGraphicsRootConstantBufferView(1, mpCamera->mBuffer.GetGPUAddress());
+
+	D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.GetVertexBufferView();
+	D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.GetIndexBufferView();
+
+	mCommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
+	mCommandList->IASetIndexBuffer(&indexBuffer);
+	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 1, 0, 0, 0);
 }
 
 void RenderWindow::EndFrame()
