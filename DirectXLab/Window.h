@@ -10,10 +10,12 @@ public:
 	bool IsOpen() const { return mIsOpen; }
 	int GetWidth() const { return mWidth; }
 	int GetHeight() const { return mHeight; }
-	float AspectRatio() const { return static_cast<float>(mWidth) / static_cast<float>(mHeight); }
+	float GetAspectRatio() const { return static_cast<float>(mWidth) / static_cast<float>(mHeight); }
+
+	static constexpr DXGI_FORMAT sBackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
+	static constexpr DXGI_FORMAT sDepthStencilFormat{ DXGI_FORMAT_D24_UNORM_S8_UINT };
 
 protected:
-	ID3D12CommandQueue* mCommandQueue;
 	ID3D12GraphicsCommandList* mCommandList;
 	ID3D12CommandAllocator* mCommandAllocator;
 
@@ -40,13 +42,9 @@ protected:
 	int mWidth;
 	int mHeight;
 
-	static constexpr DXGI_FORMAT sBackBufferFormat { DXGI_FORMAT_R8G8B8A8_UNORM };
-	static constexpr DXGI_FORMAT sDepthStencilFormat { DXGI_FORMAT_D24_UNORM_S8_UINT };
-
 protected:
-	void FlushCommandQueue();
 	void OpenCommandList() const;
-	void ExecuteCommandList();
+	void ExecuteCommandList() const;
 	ID3D12Resource* GetCurrentBackBuffer() const { return mSwapChainBuffers[mCurrentBackBuffer]; }
 
 private:

@@ -29,6 +29,12 @@ inline bool operator!=( const D3D12_VIEWPORT& l, const D3D12_VIEWPORT& r )
 { return !( l == r ); }
 
 //------------------------------------------------------------------------------------------------
+inline UINT CalcConstantBufferByteSize(UINT byteSize)
+{
+    return (byteSize + 255) & ~255;
+}
+
+//------------------------------------------------------------------------------------------------
 struct CD3DX12_RECT : public D3D12_RECT
 {
     CD3DX12_RECT()

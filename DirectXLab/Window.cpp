@@ -26,7 +26,6 @@ Window::~Window()
 {
 	mCommandAllocator->Release();
 	mCommandList->Release();
-	mCommandQueue->Release();
 	mSwapChain->Release();
 
 	for (ID3D12Resource* buffer : mSwapChainBuffers) buffer->Release();
@@ -56,13 +55,11 @@ void Window::OpenCommandList() const
 	mCommandList->Reset(mCommandAllocator, nullptr);
 }
 
-void Window::ExecuteCommandList()
+void Window::ExecuteCommandList() const
 {
 	mCommandList->Close();
 	ID3D12CommandList* cmdsLists[] = { mCommandList };
-	mCommandQueue->ExecuteCommandLists(1, cmdsLists);
-
-	FlushCommandQueue();
+	RenderContext::GetCommandQueue()->ExecuteCommandLists(1, cmdsLists);
 }
 
 LRESULT Window::HandleEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -125,7 +122,7 @@ bool Window::CreateWindowClass(std::wstring_view title, int width, int height)
 	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
-	wc.lpszClassName = L"MainWnd";
+	wc.lpszClassName = title.data();
 
 	mWindowClass = RegisterClass(&wc);
 	if (!mWindowClass)
@@ -134,7 +131,7 @@ bool Window::CreateWindowClass(std::wstring_view title, int width, int height)
 			return false;
 	}
 
-	mWindowHandle = CreateWindow(L"MainWnd", title.data(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width,
+	mWindowHandle = CreateWindow(title.data(), title.data(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width,
 		height, 0, 0, mHInstance, 0);
 	if (!mWindowHandle)
 	{
@@ -151,18 +148,7 @@ bool Window::CreateCmdObjects()
 {
 	ID3D12Device* device = RenderContext::GetDevice();
 
-	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-
-	HRESULT res = device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
-	if (FAILED(res))
-	{
-		PRINT_COM_ERROR("Failed to create command queue", res);
-		return false;
-	}
-
-	res = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
+	HRESULT res = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create command allocator", res);
@@ -200,7 +186,7 @@ bool Window::CreateSwapChain()
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	HRESULT res = RenderContext::GetDXGIFactory()->CreateSwapChain(mCommandQueue, &sd, &mSwapChain);
+	HRESULT res = RenderContext::GetDXGIFactory()->CreateSwapChain(RenderContext::GetCommandQueue(), &sd, &mSwapChain);
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create swap chain", res);
@@ -319,25 +305,5 @@ void Window::Update() const
 	{
 		TranslateMessage(&msg);
 		DispatchMessageW(&msg);
-	}
-}
-
-void Window::FlushCommandQueue()
-{
-	ID3D12Fence* fence = RenderContext::GetFence();
-	ulong& currentFenceValue = RenderContext::GetCurrentFenceValue();
-
-	currentFenceValue++;
-
-	mCommandQueue->Signal(fence, currentFenceValue);
-
-	if (fence->GetCompletedValue() < currentFenceValue)
-	{
-		HANDLE eventHandle = CreateEventEx(nullptr, L"", false, EVENT_ALL_ACCESS);
-
-		fence->SetEventOnCompletion(currentFenceValue, eventHandle);
-
-		WaitForSingleObject(eventHandle, INFINITE);
-		CloseHandle(eventHandle);
 	}
 }
