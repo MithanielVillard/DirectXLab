@@ -28,10 +28,13 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	while (window.IsOpen())
 	{
 		window.Update();
+
 		cam.SetAspectRatio(window.GetAspectRatio());
 
 		window.BeginFrame(cam);
 		window.Draw(cubeGeo, pso, cubeTransform);
 		window.EndFrame();
+
+		RenderContext::FlushCommandQueue();
 	}
 }

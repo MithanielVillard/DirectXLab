@@ -60,8 +60,6 @@ void Window::ExecuteCommandList() const
 	mCommandList->Close();
 	ID3D12CommandList* cmdsLists[] = { mCommandList };
 	RenderContext::GetCommandQueue()->ExecuteCommandLists(1, cmdsLists);
-
-	RenderContext::FlushCommandQueue();
 }
 
 LRESULT Window::HandleEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
