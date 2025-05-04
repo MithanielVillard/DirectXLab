@@ -15,12 +15,16 @@ public:
 	Transform(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scale);
 	~Transform() = default;
 
+	XMFLOAT3& GetPosition();
+
+	void SetPosition(XMFLOAT3 const& pos);
+
 	void UpdateTransformMatrix();
 
-private:
 	XMFLOAT3 mPos;
 	XMFLOAT4 mQuaternionRot;
 	XMFLOAT3 mScale;
+private:
 
 	DynamicBuffer mBuffer = DynamicBuffer(sizeof(ObjectData));
 

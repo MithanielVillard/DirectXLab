@@ -13,6 +13,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 {
 	RenderContext::Init();
 	RenderWindow window(L"Window 1", 900, 500);
+	RenderWindow window2(L"Window 2", 900, 500);
 
 	Shader vs("VertexShader.cso");
 	Shader ps("PixelShader.cso");
@@ -20,6 +21,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	D12PipelineObject pso(vs, ps, rootSig);
 
 	Camera cam({ 0.0f, 1.0f, -10.0f }, { 0.0f, 1.0f, 0.0f }, window.GetAspectRatio());
+	Camera cam2({ 16.0f, 1.0f, -10.0f }, { 0.0f, 1.0f, 0.0f }, window.GetAspectRatio());
 
 	Geometry cubeGeo = GeometryFactory::CreateCubeGeo();
 	Transform cubeTransform({ 0.0f, 0.0f, 0.0f }, { 0.0f, 45.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
@@ -28,14 +30,24 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	while (window.IsOpen())
 	{
 		window.Update();
+		window2.Update();
 
 		cam.SetAspectRatio(window.GetAspectRatio());
+		cam2.SetAspectRatio(window2.GetAspectRatio());
 
 		window.BeginDraw(cam);
 		window.Draw(cubeGeo, pso, cubeTransform);
 		window.EndDraw();
 
+		window2.BeginDraw(cam2);
+		window2.Draw(cubeGeo, pso, cubeTransform);
+		window2.EndDraw();
+
 		RenderContext::EndFrame();
 		window.Display();
+		window2.Display();
+
+		cubeTransform.mPos.x += 0.01f;
+		cubeTransform.UpdateTransformMatrix();
 	}
 }

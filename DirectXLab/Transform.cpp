@@ -10,6 +10,16 @@ Transform::Transform(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scale)
 	mBuffer.SetName(L"Transform constant buffer");
 }
 
+XMFLOAT3& Transform::GetPosition()
+{
+	return mPos;
+}
+
+void Transform::SetPosition(XMFLOAT3 const& pos)
+{
+	mPos = pos;
+}
+
 void Transform::UpdateTransformMatrix()
 {
 	XMMATRIX world =
