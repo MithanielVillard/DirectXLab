@@ -1,17 +1,22 @@
 #include "pch.h"
 #include "RenderWindow.h"
 
+#include <thread>
+
 #include "Camera.h"
 #include "D12PipelineObject.h"
 #include "Geometry.h"
 #include "RenderContext.h"
 #include "Transform.h"
 
-void RenderWindow::BeginFrame(const Camera& camera)
-{
-	OpenCommandList();
+RenderWindow::RenderWindow(std::wstring_view const title, int const width, int const height) : Window(title, width, height){}
 
+void RenderWindow::BeginDraw(const Camera& camera)
+{
 	mpCamera = &camera;
+
+	mCommandAllocator->Reset();
+	mCommandList->Reset(mCommandAllocator, nullptr);
 
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	mCommandList->ResourceBarrier(1, &barrier);
@@ -26,6 +31,7 @@ void RenderWindow::BeginFrame(const Camera& camera)
 
 	mCommandList->ClearRenderTargetView(currentBackBufferView, DirectX::Colors::LightSteelBlue, 0, nullptr);
 	mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
 }
 
 void RenderWindow::Draw(Geometry& geo, const D12PipelineObject& pso, const Transform& transform)
@@ -46,13 +52,17 @@ void RenderWindow::Draw(Geometry& geo, const D12PipelineObject& pso, const Trans
 	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 1, 0, 0, 0);
 }
 
-void RenderWindow::EndFrame()
+void RenderWindow::EndDraw()
 {
-	
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	mCommandList->ResourceBarrier(1, &barrier);
 
-	ExecuteCommandList();
+	mCommandList->Close();
+	RenderContext::AddPendingList(mCommandList);
+}
+
+void RenderWindow::Display()
+{
 	mSwapChain->Present(0, 0);
 	mCurrentBackBuffer = (mCurrentBackBuffer + 1) % sSwapChainBufferCount;
 }

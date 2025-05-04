@@ -43,8 +43,6 @@ protected:
 	int mHeight;
 
 protected:
-	void OpenCommandList() const;
-	void ExecuteCommandList() const;
 	ID3D12Resource* GetCurrentBackBuffer() const { return mSwapChainBuffers[mCurrentBackBuffer]; }
 
 private:

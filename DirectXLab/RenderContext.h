@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "D12DebugLayer.h"
 
 class StaticBuffer;
@@ -8,7 +9,9 @@ class RenderContext
 public:
 	static bool Init();
 	static void FlushCommandQueue();
+	static void EndFrame();
 	static void UploadBuffer(StaticBuffer& buffer);
+	static void AddPendingList(ID3D12CommandList* pList) { Instance().mPendingLists.push_back(pList); }
 
 	static IDXGIFactory* GetDXGIFactory() { return Instance().mDxgiFactory; }
 	static ID3D12Device* GetDevice() { return Instance().mDevice; }
@@ -40,6 +43,8 @@ private:
 	ID3D12CommandQueue* mCommandQueue;
 	ID3D12CommandAllocator* mCommandAllocator;
 	ID3D12GraphicsCommandList* mCommandList;
+
+	std::vector<ID3D12CommandList*> mPendingLists;
 
 #ifdef _DEBUG
 	D12DebugLayer mDebugLayer;

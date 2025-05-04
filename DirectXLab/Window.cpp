@@ -49,19 +49,6 @@ LRESULT Window::SubclassProc(const HWND hWnd, const UINT uMsg, const WPARAM wPar
 	return reinterpret_cast<Window*>(dwRefData)->HandleEvent(hWnd, uMsg, wParam, lParam);
 }
 
-void Window::OpenCommandList() const
-{
-	mCommandAllocator->Reset();
-	mCommandList->Reset(mCommandAllocator, nullptr);
-}
-
-void Window::ExecuteCommandList() const
-{
-	mCommandList->Close();
-	ID3D12CommandList* cmdsLists[] = { mCommandList };
-	RenderContext::GetCommandQueue()->ExecuteCommandLists(1, cmdsLists);
-}
-
 LRESULT Window::HandleEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)

@@ -81,6 +81,14 @@ void RenderContext::FlushCommandQueue()
 	}
 }
 
+void RenderContext::EndFrame()
+{
+	RenderContext& context = Instance();
+	context.mCommandQueue->ExecuteCommandLists(static_cast<UINT>(context.mPendingLists.size()), context.mPendingLists.data());
+	FlushCommandQueue();
+	context.mPendingLists.clear();
+}
+
 void RenderContext::UploadBuffer(StaticBuffer& buffer)
 {
 	RenderContext& context = Instance();
