@@ -85,6 +85,8 @@ void Window::ResizeViewport()
 
 void Window::ResizeWindow(int const newWidth, int const newHeight)
 {
+	RenderContext::FlushCommandQueue();
+
 	ReleaseDepthStencilBuffer();
 	ReleaseSwapChainBuffers();
 
@@ -185,7 +187,7 @@ bool Window::CreateSwapChain()
 
 bool Window::CreateSwapChainBuffersHeap()
 {
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc{};
+	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	descHeapDesc.NumDescriptors = sSwapChainBufferCount;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
@@ -202,7 +204,7 @@ bool Window::CreateSwapChainBuffersHeap()
 	for (int i = 0; i < sSwapChainBufferCount; i++)
 	{
 		mRtvHandles[i] = firstHandle;
-		mRtvHandles[i].ptr += RenderContext::sRtvDescriptorSize * i;
+		firstHandle.Offset(1, RenderContext::sRtvDescriptorSize);
 	}
 
 	return true;
@@ -252,7 +254,7 @@ bool Window::RetrieveDepthStencilBuffer()
 		1, 
 		sDepthStencilFormat, 
 		1, 
-		0, 
+		0,
 		D3D12_TEXTURE_LAYOUT_UNKNOWN, 
 		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
@@ -262,8 +264,13 @@ bool Window::RetrieveDepthStencilBuffer()
 	optClear.DepthStencil.Stencil = 0;
 
 	CD3DX12_HEAP_PROPERTIES dsvHeapProp(D3D12_HEAP_TYPE_DEFAULT);
-
 	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = sDepthStencilFormat;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	RenderContext::GetDevice()->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, mDSHeap->GetCPUDescriptorHandleForHeapStart());
 
 	return true;
 }

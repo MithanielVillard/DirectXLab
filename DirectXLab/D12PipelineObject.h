@@ -19,5 +19,6 @@ private:
 	};
 
 	friend class RenderWindow;
+	friend class D12ComputePipelineObject;
 };
 

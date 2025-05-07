@@ -64,6 +64,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="D12ComputePipelineObject.h">
+      <Filter>Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadbackBuffer.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
@@ -108,7 +111,7 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="D12ComputePipelineObject.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Wrappers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

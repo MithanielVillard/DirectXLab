@@ -142,6 +142,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GeometryFactory.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ReadbackBuffer.hpp" />
     <ClInclude Include="RenderContext.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />

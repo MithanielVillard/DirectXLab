@@ -16,6 +16,8 @@ D12DebugLayer::D12DebugLayer()
 		PRINT_COM_ERROR("Error while creating dxgi debug interface", res);
 		return;
 	}
+
+	mDebugLayer->EnableDebugLayer();
 }
 
 D12DebugLayer::~D12DebugLayer()

@@ -7,7 +7,7 @@ bool RenderContext::Init()
 {
 	RenderContext& context = Instance();
 
-	HRESULT res = CreateDXGIFactory(IID_PPV_ARGS(&context.mDxgiFactory));
+	HRESULT res = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG,IID_PPV_ARGS(&context.mDxgiFactory));
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Error while creating factory", res);
