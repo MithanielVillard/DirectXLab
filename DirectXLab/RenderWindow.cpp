@@ -15,7 +15,7 @@ RenderWindow::RenderWindow(std::wstring_view const title, int const width, int c
 	CD3DX12_HEAP_PROPERTIES prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 	CD3DX12_RESOURCE_DESC resource = CD3DX12_RESOURCE_DESC::Buffer(mComputeData.size() * sizeof(int), D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
-	HRESULT res = RenderContext::GetDevice()->CreateCommittedResource(&prop, D3D12_HEAP_FLAG_NONE, &resource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, nullptr, IID_PPV_ARGS(&mComputeOutput));
+	HRESULT res = RenderContext::GetDevice()->CreateCommittedResource(&prop, D3D12_HEAP_FLAG_NONE, &resource, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&mComputeOutput));
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create compute output buffer", res);
@@ -46,7 +46,7 @@ void RenderWindow::BeginDraw(const Camera& camera)
 
 	mCommandList->OMSetRenderTargets(1, &mRtvHandles[mCurrentBackBuffer], true, &depthStencilView);
 
-	mCommandList->ClearRenderTargetView(mRtvHandles[mCurrentBackBuffer], Colors::LightSteelBlue, 0, nullptr);
+	mCommandList->ClearRenderTargetView(mRtvHandles[mCurrentBackBuffer], sClearColor, 0, nullptr);
 	mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 }

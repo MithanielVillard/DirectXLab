@@ -144,6 +144,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="ReadbackBuffer.hpp" />
     <ClInclude Include="RenderContext.h" />
+    <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="StaticBuffer.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="GeometryFactory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RenderContext.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="StaticBuffer.cpp" />

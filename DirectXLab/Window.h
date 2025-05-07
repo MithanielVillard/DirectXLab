@@ -15,6 +15,8 @@ public:
 	static constexpr DXGI_FORMAT sBackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
 	static constexpr DXGI_FORMAT sDepthStencilFormat{ DXGI_FORMAT_D24_UNORM_S8_UINT };
 
+	inline static const DirectX::XMVECTORF32 sClearColor{ DirectX::Colors::LightBlue };
+
 protected:
 	ID3D12GraphicsCommandList* mCommandList;
 	ID3D12CommandAllocator* mCommandAllocator;

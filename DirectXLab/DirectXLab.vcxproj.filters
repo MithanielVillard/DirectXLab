@@ -69,6 +69,9 @@
     <ClInclude Include="ReadbackBuffer.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="RenderTarget.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -112,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="D12ComputePipelineObject.cpp">
       <Filter>Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTarget.cpp">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
