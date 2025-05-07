@@ -29,5 +29,6 @@ private:
 	DynamicBuffer mBuffer = DynamicBuffer(sizeof(ObjectData));
 
 	friend class RenderWindow;
+	friend class RenderTarget;
 };
 

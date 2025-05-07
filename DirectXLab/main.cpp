@@ -6,6 +6,7 @@
 #include "Geometry.h"
 #include "GeometryFactory.h"
 #include "RenderContext.h"
+#include "RenderTarget.h"
 #include "RenderWindow.h"
 #include "Shader.h"
 #include "Transform.h"
@@ -29,11 +30,18 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	Transform cubeTransform({ 0.0f, 0.0f, 0.0f }, { 0.0f, 45.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
 	cubeTransform.UpdateTransformMatrix();
 
+	RenderTarget target(window.GetWidth(), window.GetHeight());
+
 	while (window.IsOpen())
 	{
 		window.Update();
 
 		cam.SetAspectRatio(window.GetAspectRatio());
+
+		//Render Target
+		target.Begin(cam);
+		target.Draw(cubeGeo, pso, cubeTransform, &computePso);
+		target.End();
 
 		window.BeginDraw(cam);
 		window.Draw(cubeGeo, pso, cubeTransform, &computePso);

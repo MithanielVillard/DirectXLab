@@ -36,5 +36,6 @@ private:
 	XMFLOAT4 mRotation;
 
 	friend class RenderWindow;
+	friend class RenderTarget;
 };
 

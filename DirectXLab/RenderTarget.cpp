@@ -1,7 +1,11 @@
 #include "pch.h"
 #include "RenderTarget.h"
 
+#include "Camera.h"
+#include "D12PipelineObject.h"
+#include "Geometry.h"
 #include "RenderContext.h"
+#include "Transform.h"
 #include "Window.h"
 
 RenderTarget::RenderTarget(uint const width, uint const height) : mWidth(width), mHeight(height)
@@ -20,11 +24,22 @@ RenderTarget::RenderTarget(uint const width, uint const height) : mWidth(width),
 		return;
 	}
 
+	mCommandList->Close();
+
+	CreateResource();
+	CreateRTVHeap();
+	CreateDepthBuffer();
+	CreateViewport();
+}
+
+void RenderTarget::CreateResource()
+{
+
 	CD3DX12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-		Window::sBackBufferFormat, 
-		width, 
-		height,
+		Window::sBackBufferFormat,
+		mWidth,
+		mHeight,
 		1,
 		0,
 		1,
@@ -36,24 +51,61 @@ RenderTarget::RenderTarget(uint const width, uint const height) : mWidth(width),
 	optClear.Format = Window::sBackBufferFormat;
 	memcpy(optClear.Color, Window::sClearColor, sizeof(float) * 4);
 
-	res = RenderContext::GetDevice()->CreateCommittedResource(
-		&heapProp, 
-		D3D12_HEAP_FLAG_NONE, 
-		&resourceDesc, 
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+	HRESULT res = RenderContext::GetDevice()->CreateCommittedResource(
+		&heapProp,
+		D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 		&optClear,
 		IID_PPV_ARGS(&mBuffer)
 	);
+	mBuffer->SetName(L"Render Target Texture");
 
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create render target", res);
 		return;
 	}
-
-	CreateRTVHeap();
-	CreateViewport();
 }
+
+void RenderTarget::CreateDepthBuffer()
+{
+
+	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+	descHeapDesc.NodeMask = 0;
+	descHeapDesc.NumDescriptors = 1;
+	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+
+	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mDSVHeap));
+
+	CD3DX12_HEAP_PROPERTIES dsvHeapProp(D3D12_HEAP_TYPE_DEFAULT);
+	CD3DX12_RESOURCE_DESC depthStencilDesc(D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		0,
+		mWidth,
+		mHeight,
+		1,
+		1,
+		Window::sDepthStencilFormat,
+		1,
+		0,
+		D3D12_TEXTURE_LAYOUT_UNKNOWN,
+		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+	D3D12_CLEAR_VALUE optClear = {};
+	optClear.Format = Window::sDepthStencilFormat;
+	optClear.DepthStencil.Depth = 1.0f;
+	optClear.DepthStencil.Stencil = 0;
+
+	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthBuffer));
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = Window::sDepthStencilFormat;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	RenderContext::GetDevice()->CreateDepthStencilView(mDepthBuffer, &dsvDesc, mDSVHeap->GetCPUDescriptorHandleForHeapStart());
+
+}
+
 
 void RenderTarget::CreateRTVHeap()
 {
@@ -63,7 +115,7 @@ void RenderTarget::CreateRTVHeap()
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	descHeapDesc.NodeMask = 0;
 
-	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mHeap));
+	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mRTVHeap));
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create render target heap", res);
@@ -74,7 +126,7 @@ void RenderTarget::CreateRTVHeap()
 	rtvDesc.Format = Window::sBackBufferFormat;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-	RenderContext::GetDevice()->CreateRenderTargetView(mBuffer, &rtvDesc, mHeap->GetCPUDescriptorHandleForHeapStart());
+	RenderContext::GetDevice()->CreateRenderTargetView(mBuffer, &rtvDesc, mRTVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void RenderTarget::CreateViewport()
@@ -90,8 +142,10 @@ void RenderTarget::CreateViewport()
 	mScissorRect.bottom = static_cast<LONG>(mHeight);
 }
 
-void RenderTarget::Begin(Camera& camera)
+void RenderTarget::Begin(Camera const& camera)
 {
+	mpCamera = &camera;
+
 	mCommandAllocator->Reset();
 	mCommandList->Reset(mCommandAllocator, nullptr);
 
@@ -102,7 +156,41 @@ void RenderTarget::Begin(Camera& camera)
 	mCommandList->RSSetViewports(1, &mViewport);
 	mCommandList->RSSetScissorRects(1, &mScissorRect);
 
-	//mCommandList->OMSetRenderTargets(1, &mHeap->GetCPUDescriptorHandleForHeapStart(), false, )
+	D3D12_CPU_DESCRIPTOR_HANDLE rtv = mRTVHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsv = mDSVHeap->GetCPUDescriptorHandleForHeapStart();
+
+	mCommandList->OMSetRenderTargets(1, &rtv, false, &dsv);
+
+	mCommandList->ClearRenderTargetView(rtv, Window::sClearColor, 0, nullptr);
+	mCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+}
+
+void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform,
+	D12ComputePipelineObject const* computePso)
+{
+	mCommandList->SetGraphicsRootSignature(pso.mRootSignature);
+	mCommandList->SetPipelineState(pso.mPipelineState);
+
+	mCommandList->SetGraphicsRootConstantBufferView(0, transform.mBuffer.GetGPUAddress());
+	mCommandList->SetGraphicsRootConstantBufferView(1, mpCamera->mBuffer.GetGPUAddress());
+
+	D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.GetVertexBufferView();
+	D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.GetIndexBufferView();
+
+	mCommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
+	mCommandList->IASetIndexBuffer(&indexBuffer);
+	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 1, 0, 0, 0);
+}
+
+void RenderTarget::End()
+{
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	mCommandList->ResourceBarrier(1, &barrier);
+
+	mCommandList->Close();
+	RenderContext::AddPendingList(mCommandList);
 }
 
 RenderTarget::RenderTarget(RenderTarget const& other)
@@ -113,6 +201,10 @@ RenderTarget::RenderTarget(RenderTarget const& other)
 
 RenderTarget::~RenderTarget()
 {
+	mCommandAllocator->Release();
+	mCommandList->Release();
+	mDepthBuffer->Release();
 	mBuffer->Release();
+	mRTVHeap->Release();
+	mDSVHeap->Release();
 }
-
