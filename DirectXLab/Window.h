@@ -1,4 +1,6 @@
 #pragma once
+#include <functional>
+
 class Window
 {
 public:
@@ -11,6 +13,8 @@ public:
 	int GetWidth() const { return mWidth; }
 	int GetHeight() const { return mHeight; }
 	float GetAspectRatio() const { return static_cast<float>(mWidth) / static_cast<float>(mHeight); }
+
+	void OnWindowResize(std::function<void(Window*)> const& func) { mResizeCallBack = func; }
 
 	static constexpr DXGI_FORMAT sBackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
 	static constexpr DXGI_FORMAT sDepthStencilFormat{ DXGI_FORMAT_D24_UNORM_S8_UINT };
@@ -39,6 +43,8 @@ protected:
 	bool mIsOpen;
 	int mWidth;
 	int mHeight;
+
+	std::function<void(Window*)> mResizeCallBack;
 
 protected:
 	ID3D12Resource* GetCurrentBackBuffer() const { return mSwapChainBuffers[mCurrentBackBuffer]; }

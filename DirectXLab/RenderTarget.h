@@ -16,17 +16,22 @@ public:
 
 	~RenderTarget();
 
-	void CreateResource();
-	void CreateDepthBuffer();
-
-	void CreateRTVHeap();
-	void CreateViewport();
-
 	void Begin(const Camera& camera);
 	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, D12ComputePipelineObject const* computePso);
 	void End();
 
-private:
+	void Resize(uint width, uint height);
+
+protected:
+	void CreateRTVHeap();
+	void CreateDSVHeap();
+
+	void RetrieveRTBuffer();
+	void RetrieveDSBuffer();
+
+	void CreateViewport();
+
+protected:
 	ID3D12Resource* mRenderTargetBuffer = nullptr;
 	ID3D12Resource* mDepthStencilBuffer = nullptr;
 	ID3D12DescriptorHeap* mRTVHeap = nullptr;

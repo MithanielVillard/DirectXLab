@@ -26,15 +26,77 @@ RenderTarget::RenderTarget(uint const width, uint const height) : mWidth(width),
 
 	mCommandList->Close();
 
-	CreateResource();
 	CreateRTVHeap();
-	CreateDepthBuffer();
+	CreateDSVHeap();
+
 	CreateViewport();
+
+	RetrieveRTBuffer();
+	RetrieveDSBuffer();
 }
 
-void RenderTarget::CreateResource()
+void RenderTarget::CreateDSVHeap()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+	descHeapDesc.NodeMask = 0;
+	descHeapDesc.NumDescriptors = 1;
+	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+
+	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mDSVHeap));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to create depth stencil heap", res);
+	}
+}
+
+void RenderTarget::RetrieveDSBuffer()
 {
 
+	CD3DX12_HEAP_PROPERTIES dsvHeapProp(D3D12_HEAP_TYPE_DEFAULT);
+	CD3DX12_RESOURCE_DESC depthStencilDesc(D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+		0,
+		mWidth,
+		mHeight,
+		1,
+		1,
+		Window::sDepthStencilFormat,
+		RenderContext::GetMSAACount(),
+		RenderContext::GetMSAAQualityLevel(),
+		D3D12_TEXTURE_LAYOUT_UNKNOWN,
+		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+
+	D3D12_CLEAR_VALUE optClear = {};
+	optClear.Format = Window::sDepthStencilFormat;
+	optClear.DepthStencil.Depth = 1.0f;
+	optClear.DepthStencil.Stencil = 0;
+
+	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
+
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+	dsvDesc.Format = Window::sDepthStencilFormat;
+	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
+	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+	RenderContext::GetDevice()->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, mDSVHeap->GetCPUDescriptorHandleForHeapStart());
+}
+
+
+void RenderTarget::CreateRTVHeap()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	descHeapDesc.NumDescriptors = 1;
+	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	descHeapDesc.NodeMask = 0;
+
+	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mRTVHeap));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to create render target heap", res);
+	}
+}
+
+void RenderTarget::RetrieveRTBuffer()
+{
 	CD3DX12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		Window::sBackBufferFormat,
@@ -42,8 +104,8 @@ void RenderTarget::CreateResource()
 		mHeight,
 		1,
 		1,
-		4,
-		RenderContext::GetMSAAQualityLevel(4),
+		RenderContext::GetMSAACount(),
+		RenderContext::GetMSAAQualityLevel(),
 		D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET
 	);
 
@@ -64,62 +126,6 @@ void RenderTarget::CreateResource()
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create render target", res);
-		return;
-	}
-}
-
-void RenderTarget::CreateDepthBuffer()
-{
-
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-	descHeapDesc.NodeMask = 0;
-	descHeapDesc.NumDescriptors = 1;
-	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-
-	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mDSVHeap));
-
-	CD3DX12_HEAP_PROPERTIES dsvHeapProp(D3D12_HEAP_TYPE_DEFAULT);
-	CD3DX12_RESOURCE_DESC depthStencilDesc(D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-		0,
-		mWidth,
-		mHeight,
-		1,
-		1,
-		Window::sDepthStencilFormat,
-		4,
-		RenderContext::GetMSAAQualityLevel(4),
-		D3D12_TEXTURE_LAYOUT_UNKNOWN,
-		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
-
-	D3D12_CLEAR_VALUE optClear = {};
-	optClear.Format = Window::sDepthStencilFormat;
-	optClear.DepthStencil.Depth = 1.0f;
-	optClear.DepthStencil.Stencil = 0;
-
-	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
-
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = Window::sDepthStencilFormat;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
-	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-	RenderContext::GetDevice()->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, mDSVHeap->GetCPUDescriptorHandleForHeapStart());
-
-}
-
-
-void RenderTarget::CreateRTVHeap()
-{
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	descHeapDesc.NumDescriptors = 1;
-	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	descHeapDesc.NodeMask = 0;
-
-	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mRTVHeap));
-	if (FAILED(res))
-	{
-		PRINT_COM_ERROR("Failed to create render target heap", res);
-		return;
 	}
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -140,6 +146,20 @@ void RenderTarget::CreateViewport()
 	mScissorRect.left = mScissorRect.top = 0;
 	mScissorRect.right = static_cast<LONG>(mWidth);
 	mScissorRect.bottom = static_cast<LONG>(mHeight);
+}
+
+void RenderTarget::Resize(uint width, uint height)
+{
+	mRenderTargetBuffer->Release();
+	mDepthStencilBuffer->Release();
+
+	mWidth = width;
+	mHeight = height;
+
+	CreateViewport();
+
+	RetrieveRTBuffer();
+	RetrieveDSBuffer();
 }
 
 void RenderTarget::Begin(Camera const& camera)

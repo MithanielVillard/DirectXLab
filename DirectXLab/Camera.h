@@ -19,7 +19,7 @@ public:
 	Camera(XMFLOAT3 const& pos, XMFLOAT3 const& up, float aspectRatio, CameraType type = PERSPECTIVE);
 	~Camera() = default;
 
-	void SetAspectRatio(float aspectRatio) { mAspectRatio = aspectRatio; UpdateVPMatrix(); }
+	void SetAspectRatio(float aspectRatio);
 
 private:
 	void UpdateVPMatrix();
@@ -29,11 +29,12 @@ private:
 
 	CameraType mType;
 
-	float mAspectRatio;
 	XMFLOAT3 mPos;
 	XMFLOAT3 mForward = { 0.0f, 0.0f, 1.0f };
 	XMFLOAT3 mUp;
 	XMFLOAT4 mRotation;
+
+	XMFLOAT4X4 mProjMatrix;
 
 	friend class RenderWindow;
 	friend class RenderTarget;

@@ -90,6 +90,8 @@ void Window::ResizeWindow(int const newWidth, int const newHeight)
 
 	RetrieveSwapChainBuffers();
 	mCurrentBackBuffer = 0;
+
+	if (mResizeCallBack) mResizeCallBack(this);
 }
 
 bool Window::CreateWindowClass(std::wstring_view title, int width, int height)

@@ -13,16 +13,18 @@ public:
 	static void UploadBuffer(StaticBuffer& buffer);
 	static void AddPendingList(ID3D12CommandList* pList) { Instance().mPendingLists.push_back(pList); }
 
+	static void SetMSAA(const uint count) { Instance().mMSAACount = count; }
+
 	static IDXGIFactory* GetDXGIFactory() { return Instance().mDxgiFactory; }
 	static ID3D12Device* GetDevice() { return Instance().mDevice; }
 	static ID3D12Fence* GetFence() { return Instance().mFence; }
 	static ID3D12CommandQueue* GetCommandQueue() { return Instance().mCommandQueue; }
 	static ulong& GetCurrentFenceValue() { return Instance().mCurrentFenceValue; }
-	static uint GetMSAAQualityLevel(uint count);
 
 	inline static uint sRtvDescriptorSize;
 	inline static uint sDsvDescriptorSize;
 	inline static uint sCbvSrvUavDescriptorSize;
+
 private:
 	RenderContext() = default;
 	~RenderContext();
@@ -32,6 +34,9 @@ private:
 		static RenderContext rc;
 		return rc;
 	}
+
+	static uint GetMSAAQualityLevel();
+	static uint GetMSAACount() { return Instance().mMSAACount; }
 
 private:
 
@@ -47,9 +52,14 @@ private:
 
 	std::vector<ID3D12CommandList*> mPendingLists;
 
+	uint mMSAACount = 1;
+
 #ifdef _DEBUG
 	D12DebugLayer mDebugLayer;
 #endif
+
+	friend class RenderTarget;
+	friend class D12PipelineObject;
 
 };
 

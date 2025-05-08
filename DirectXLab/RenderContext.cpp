@@ -114,13 +114,13 @@ void RenderContext::UploadBuffer(StaticBuffer& buffer)
 	buffer.mUploadBuffer = nullptr;
 }
 
-uint RenderContext::GetMSAAQualityLevel(uint count)
+uint RenderContext::GetMSAAQualityLevel()
 {
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS desc = {};
 	desc.Format = Window::sBackBufferFormat;
 	desc.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	desc.NumQualityLevels = 0;
-	desc.SampleCount = count;
+	desc.SampleCount = Instance().mMSAACount;
 	Instance().mDevice->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &desc, sizeof(desc));
 
 	return desc.NumQualityLevels - 1;
