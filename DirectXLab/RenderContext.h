@@ -18,6 +18,7 @@ public:
 	static ID3D12Fence* GetFence() { return Instance().mFence; }
 	static ID3D12CommandQueue* GetCommandQueue() { return Instance().mCommandQueue; }
 	static ulong& GetCurrentFenceValue() { return Instance().mCurrentFenceValue; }
+	static uint GetMSAAQualityLevel(uint count);
 
 	inline static uint sRtvDescriptorSize;
 	inline static uint sDsvDescriptorSize;

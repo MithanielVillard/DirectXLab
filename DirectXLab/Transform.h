@@ -18,6 +18,7 @@ public:
 	XMFLOAT3& GetPosition();
 
 	void SetPosition(XMFLOAT3 const& pos);
+	void Rotate(float x, float y, float z);
 
 	void UpdateTransformMatrix();
 
@@ -27,6 +28,8 @@ public:
 private:
 
 	DynamicBuffer mBuffer = DynamicBuffer(sizeof(ObjectData));
+
+	XMFLOAT4X4 mMatrix;
 
 	friend class RenderWindow;
 	friend class RenderTarget;

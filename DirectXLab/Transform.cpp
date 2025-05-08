@@ -20,6 +20,11 @@ void Transform::SetPosition(XMFLOAT3 const& pos)
 	mPos = pos;
 }
 
+void Transform::Rotate(const float x, const float y, const float z)
+{
+	XMStoreFloat4(&mQuaternionRot, XMQuaternionMultiply(XMLoadFloat4(&mQuaternionRot),XMQuaternionRotationRollPitchYaw(x, y, z)));
+}
+
 void Transform::UpdateTransformMatrix()
 {
 	XMMATRIX world =

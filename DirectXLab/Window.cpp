@@ -161,8 +161,8 @@ bool Window::CreateSwapChain()
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = mWidth;
 	sd.BufferDesc.Height = mHeight;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.RefreshRate.Numerator = 0;
+	sd.BufferDesc.RefreshRate.Denominator = 0;
 	sd.BufferDesc.Format = sBackBufferFormat;
 	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;

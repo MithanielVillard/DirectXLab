@@ -27,6 +27,8 @@ public:
 
 	void BeginDraw(Camera const& camera);
 	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, D12ComputePipelineObject const* computePso = nullptr);
+	void Draw(RenderTarget const&);
+
 	void EndDraw();
 	void Display();
 

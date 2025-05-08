@@ -20,6 +20,7 @@ public:
 	void CreateDepthBuffer();
 
 	void CreateRTVHeap();
+	void CreateSRVHeap();
 	void CreateViewport();
 
 	void Begin(const Camera& camera);
@@ -31,6 +32,7 @@ private:
 	ID3D12Resource* mDepthBuffer = nullptr;
 	ID3D12DescriptorHeap* mRTVHeap = nullptr;
 	ID3D12DescriptorHeap* mDSVHeap = nullptr;
+	ID3D12DescriptorHeap* mSRVHeap = nullptr;
 
 	ID3D12CommandAllocator* mCommandAllocator = nullptr;
 	ID3D12GraphicsCommandList* mCommandList = nullptr;
@@ -42,5 +44,7 @@ private:
 	uint mHeight;
 
 	Camera const* mpCamera;
+
+	friend class RenderWindow;
 };
 

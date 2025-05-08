@@ -25,8 +25,8 @@ D12PipelineObject::D12PipelineObject(Shader const& VS, Shader const& PS, Shader 
 	psoDesc.SampleMask = UINT_MAX;
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.NumRenderTargets = 1;
-	psoDesc.SampleDesc.Count = 1;
-	psoDesc.SampleDesc.Quality = 0;
+	psoDesc.SampleDesc.Count = 4;
+	psoDesc.SampleDesc.Quality = RenderContext::GetMSAAQualityLevel(4);
 	psoDesc.RTVFormats[0] = Window::sBackBufferFormat;
 	psoDesc.DSVFormat = Window::sDepthStencilFormat;
 

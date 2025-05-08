@@ -6,6 +6,7 @@
 #include "D12PipelineObject.h"
 #include "Geometry.h"
 #include "RenderContext.h"
+#include "RenderTarget.h"
 #include "Transform.h"
 
 RenderWindow::RenderWindow(std::wstring_view const title, int const width, int const height) : Window(title, width, height)
@@ -35,19 +36,18 @@ void RenderWindow::BeginDraw(const Camera& camera)
 	mCommandAllocator->Reset();
 	mCommandList->Reset(mCommandAllocator, nullptr);
 
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RESOLVE_DEST);
 	mCommandList->ResourceBarrier(1, &barrier);
 
-	mCommandList->RSSetViewports(1, &mViewPort);
-	mCommandList->RSSetScissorRects(1, &mScissorRect);
+	//mCommandList->RSSetViewports(1, &mViewPort);
+	//mCommandList->RSSetScissorRects(1, &mScissorRect);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = mDSHeap->GetCPUDescriptorHandleForHeapStart();
+	//D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView = mDSHeap->GetCPUDescriptorHandleForHeapStart();
 
-	mCommandList->OMSetRenderTargets(1, &mRtvHandles[mCurrentBackBuffer], true, &depthStencilView);
+	//mCommandList->OMSetRenderTargets(1, &mRtvHandles[mCurrentBackBuffer], true, &depthStencilView);
 
-	mCommandList->ClearRenderTargetView(mRtvHandles[mCurrentBackBuffer], sClearColor, 0, nullptr);
-	mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+	//mCommandList->ClearRenderTargetView(mRtvHandles[mCurrentBackBuffer], sClearColor, 0, nullptr);
+	//mCommandList->ClearDepthStencilView(depthStencilView, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
 }
 
@@ -92,9 +92,15 @@ void RenderWindow::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 1, 0, 0, 0);
 }
 
+void RenderWindow::Draw(RenderTarget const& rt)
+{
+	mCommandList->ResolveSubresource(mSwapChainBuffers[mCurrentBackBuffer], 0, rt.mBuffer, 0, sBackBufferFormat);
+	//mCommandList->CopyResource(mSwapChainBuffers[mCurrentBackBuffer], rt.mBuffer);
+}
+
 void RenderWindow::EndDraw()
 {
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RESOLVE_DEST, D3D12_RESOURCE_STATE_PRESENT);
 	mCommandList->ResourceBarrier(1, &barrier);
 
 	mCommandList->Close();
