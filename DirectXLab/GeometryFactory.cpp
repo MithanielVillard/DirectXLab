@@ -2,6 +2,7 @@
 #include "GeometryFactory.h"
 
 #include "Geometry.h"
+#include "OBJ_Loader.h"
 #include "Vertex.h"
 
 Geometry GeometryFactory::CreateCubeGeo()
@@ -44,7 +45,7 @@ Geometry GeometryFactory::CreateCubeGeo()
 		 {{  .5f, -.5f,  .5f }, {  1, 0, 1, 1 }, {1.0f, 1.0f}},	// 23
 	};
 
-	ushort i[36]{
+	uint i[36]{
 		// FRONT
 		0, 1, 2,
 		0, 2, 3,
@@ -71,4 +72,31 @@ Geometry GeometryFactory::CreateCubeGeo()
 	};
 
 	return Geometry(v, _countof(v), i, _countof(i));
+}
+
+Geometry GeometryFactory::LoadGeometry(std::string_view const path)
+{
+	objl::Loader loader;
+	bool loaded = loader.LoadFile(path.data());
+	if (!loaded) throw std::runtime_error("Failed to load model : " + std::string(path.data()));
+
+	std::vector<Vertex> vertices;
+	std::vector<uint> indices;
+
+	for (objl::Mesh mesh : loader.LoadedMeshes)
+	{
+		for (objl::Vertex v : mesh.Vertices)
+		{
+			vertices.emplace_back(Vertex({v.Position.X, v.Position.Y, v.Position.Z }, { 1.0f, 0.0f, 0.0f, 1.0f }, { v.TextureCoordinate.X, v.TextureCoordinate.Y }));
+		}
+
+		for (uint index : mesh.Indices)
+		{
+			indices.push_back(index);
+		}
+	}
+
+
+	return { vertices.data(), static_cast<uint>(vertices.size()), indices.data(), static_cast<uint>(indices.size()) };
+
 }

@@ -74,28 +74,12 @@ void RenderWindow::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 
 		//PRINT_DEBUG(mReadBackBuffer.GetData()[1]);
 	}
-
-	mCommandList->SetGraphicsRootSignature(pso.mRootSignature);
-	mCommandList->SetPipelineState(pso.mPipelineState);
-
-	mCommandList->SetGraphicsRootConstantBufferView(0, transform.mBuffer.GetGPUAddress());
-	mCommandList->SetGraphicsRootConstantBufferView(1, mpCamera->mBuffer.GetGPUAddress());
-	mCommandList->SetGraphicsRootUnorderedAccessView(3, mComputeOutput->GetGPUVirtualAddress());
-
-	D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.GetVertexBufferView();
-	D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.GetIndexBufferView();
-
-	mCommandList->IASetVertexBuffers(0, 1, &vertexBuffer);
-	mCommandList->IASetIndexBuffer(&indexBuffer);
-	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 1, 0, 0, 0);
 }
 
 void RenderWindow::Draw(RenderTarget const& rt)
 {
-	mCommandList->ResolveSubresource(mSwapChainBuffers[mCurrentBackBuffer], 0, rt.mBuffer, 0, sBackBufferFormat);
-	//mCommandList->CopyResource(mSwapChainBuffers[mCurrentBackBuffer], rt.mBuffer);
+	mCommandList->ResolveSubresource(mSwapChainBuffers[mCurrentBackBuffer], 0, rt.mRenderTargetBuffer, 0, sBackBufferFormat);
+	//mCommandList->CopyResource(mSwapChainBuffers[mCurrentBackBuffer], rt.mRenderTargetBuffer);
 }
 
 void RenderWindow::EndDraw()

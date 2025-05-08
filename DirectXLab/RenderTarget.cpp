@@ -57,9 +57,9 @@ void RenderTarget::CreateResource()
 		&resourceDesc,
 		D3D12_RESOURCE_STATE_RESOLVE_SOURCE,
 		&optClear,
-		IID_PPV_ARGS(&mBuffer)
+		IID_PPV_ARGS(&mRenderTargetBuffer)
 	);
-	mBuffer->SetName(L"Render Target Texture");
+	mRenderTargetBuffer->SetName(L"Render Target Texture");
 
 	if (FAILED(res))
 	{
@@ -96,13 +96,13 @@ void RenderTarget::CreateDepthBuffer()
 	optClear.DepthStencil.Depth = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
 
-	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthBuffer));
+	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 	dsvDesc.Format = Window::sDepthStencilFormat;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-	RenderContext::GetDevice()->CreateDepthStencilView(mDepthBuffer, &dsvDesc, mDSVHeap->GetCPUDescriptorHandleForHeapStart());
+	RenderContext::GetDevice()->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, mDSVHeap->GetCPUDescriptorHandleForHeapStart());
 
 }
 
@@ -126,32 +126,7 @@ void RenderTarget::CreateRTVHeap()
 	rtvDesc.Format = Window::sBackBufferFormat;
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
 
-	RenderContext::GetDevice()->CreateRenderTargetView(mBuffer, &rtvDesc, mRTVHeap->GetCPUDescriptorHandleForHeapStart());
-}
-
-void RenderTarget::CreateSRVHeap()
-{
-
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	descHeapDesc.NumDescriptors = 1;
-	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	descHeapDesc.NodeMask = 0;
-
-	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mSRVHeap));
-	if (FAILED(res))
-	{
-		PRINT_COM_ERROR("Failed to create render target heap", res);
-		return;
-	}
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-	srvDesc.Format = Window::sBackBufferFormat;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = 1;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-
-	RenderContext::GetDevice()->CreateShaderResourceView(mBuffer, &srvDesc, mSRVHeap->GetCPUDescriptorHandleForHeapStart());
+	RenderContext::GetDevice()->CreateRenderTargetView(mRenderTargetBuffer, &rtvDesc, mRTVHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
 void RenderTarget::CreateViewport()
@@ -174,7 +149,7 @@ void RenderTarget::Begin(Camera const& camera)
 	mCommandAllocator->Reset();
 	mCommandList->Reset(mCommandAllocator, nullptr);
 
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mBuffer, D3D12_RESOURCE_STATE_RESOLVE_SOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mRenderTargetBuffer, D3D12_RESOURCE_STATE_RESOLVE_SOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	mCommandList->ResourceBarrier(1, &barrier);
 
@@ -211,7 +186,7 @@ void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 
 void RenderTarget::End()
 {
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mRenderTargetBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
 	mCommandList->ResourceBarrier(1, &barrier);
 
 	mCommandList->Close();
@@ -220,16 +195,16 @@ void RenderTarget::End()
 
 RenderTarget::RenderTarget(RenderTarget const& other)
 {
-	mBuffer = other.mBuffer;
-	mBuffer->AddRef();
+	mRenderTargetBuffer = other.mRenderTargetBuffer;
+	mRenderTargetBuffer->AddRef();
 }
 
 RenderTarget::~RenderTarget()
 {
 	mCommandAllocator->Release();
 	mCommandList->Release();
-	mDepthBuffer->Release();
-	mBuffer->Release();
+	mDepthStencilBuffer->Release();
+	mRenderTargetBuffer->Release();
 	mRTVHeap->Release();
 	mDSVHeap->Release();
 }

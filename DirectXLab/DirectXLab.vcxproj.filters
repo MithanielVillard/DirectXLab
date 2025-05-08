@@ -16,6 +16,9 @@
     <Filter Include="Wrappers">
       <UniqueIdentifier>{43ba709a-f631-4db1-ae20-174229042b1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{2152cebf-513b-495d-a9d9-62fb7cedb190}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="RenderTarget.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJ_Loader.h">
+      <Filter>Libs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

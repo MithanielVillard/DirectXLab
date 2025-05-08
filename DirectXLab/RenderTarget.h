@@ -20,7 +20,6 @@ public:
 	void CreateDepthBuffer();
 
 	void CreateRTVHeap();
-	void CreateSRVHeap();
 	void CreateViewport();
 
 	void Begin(const Camera& camera);
@@ -28,11 +27,10 @@ public:
 	void End();
 
 private:
-	ID3D12Resource* mBuffer = nullptr;
-	ID3D12Resource* mDepthBuffer = nullptr;
+	ID3D12Resource* mRenderTargetBuffer = nullptr;
+	ID3D12Resource* mDepthStencilBuffer = nullptr;
 	ID3D12DescriptorHeap* mRTVHeap = nullptr;
 	ID3D12DescriptorHeap* mDSVHeap = nullptr;
-	ID3D12DescriptorHeap* mSRVHeap = nullptr;
 
 	ID3D12CommandAllocator* mCommandAllocator = nullptr;
 	ID3D12GraphicsCommandList* mCommandList = nullptr;

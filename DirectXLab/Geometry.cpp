@@ -3,7 +3,7 @@
 
 #include "Vertex.h"
 
-Geometry::Geometry(const Vertex* vertex, uint vertexCount, const ushort* indices, uint indicesCount) : mIndicesCount(indicesCount)
+Geometry::Geometry(const Vertex* vertex, uint vertexCount, const uint* indices, uint indicesCount) : mIndicesCount(indicesCount)
 {
 	const uint vbByteSize = vertexCount * sizeof(Vertex);
 	const uint ibByteSize = indicesCount * sizeof(uint);

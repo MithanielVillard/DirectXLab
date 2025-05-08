@@ -11,10 +11,8 @@ Window::Window(std::wstring_view title, int width, int height) : mHInstance(GetM
 	CreateSwapChain();
 
 	CreateSwapChainBuffersHeap();
-	CreateDepthStencilHeap();
 
 	RetrieveSwapChainBuffers();
-	RetrieveDepthStencilBuffer();
 
 	ShowWindow(mWindowHandle, SW_SHOW);
 	UpdateWindow(mWindowHandle);
@@ -29,10 +27,8 @@ Window::~Window()
 	mSwapChain->Release();
 
 	for (ID3D12Resource* buffer : mSwapChainBuffers) buffer->Release();
-	mDepthStencilBuffer->Release();
 
 	mSCBuffersHeap->Release();
-	mDSHeap->Release();
 
 	DestroyWindow(mWindowHandle);
 	UnregisterClassW(reinterpret_cast<LPCWSTR>(mWindowClass), mHInstance);
@@ -87,13 +83,11 @@ void Window::ResizeWindow(int const newWidth, int const newHeight)
 {
 	RenderContext::FlushCommandQueue();
 
-	ReleaseDepthStencilBuffer();
 	ReleaseSwapChainBuffers();
 
 	mSwapChain->ResizeBuffers(sSwapChainBufferCount, mWidth, mHeight, sBackBufferFormat, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 	ResizeViewport();
 
-	RetrieveDepthStencilBuffer();
 	RetrieveSwapChainBuffers();
 	mCurrentBackBuffer = 0;
 }
@@ -210,23 +204,6 @@ bool Window::CreateSwapChainBuffersHeap()
 	return true;
 }
 
-bool Window::CreateDepthStencilHeap()
-{
-	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc;
-	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	descHeapDesc.NumDescriptors = 1;
-	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	descHeapDesc.NodeMask = 0;
-	HRESULT res = RenderContext::GetDevice()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&mDSHeap));
-	if (FAILED(res))
-	{
-		PRINT_COM_ERROR("Failed to create DSV Heap", res);
-		return false;
-	}
-
-	return true;
-}
-
 bool Window::RetrieveSwapChainBuffers()
 {
 	for (int i = 0; i < sSwapChainBufferCount; i++)
@@ -244,37 +221,6 @@ bool Window::RetrieveSwapChainBuffers()
 	return true;
 }
 
-bool Window::RetrieveDepthStencilBuffer()
-{
-	CD3DX12_RESOURCE_DESC depthStencilDesc(D3D12_RESOURCE_DIMENSION_TEXTURE2D, 
-		0, 
-		mWidth, 
-		mHeight, 
-		1, 
-		1, 
-		sDepthStencilFormat, 
-		1, 
-		0,
-		D3D12_TEXTURE_LAYOUT_UNKNOWN, 
-		D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
-
-	D3D12_CLEAR_VALUE optClear = {};
-	optClear.Format = sDepthStencilFormat;
-	optClear.DepthStencil.Depth = 1.0f;
-	optClear.DepthStencil.Stencil = 0;
-
-	CD3DX12_HEAP_PROPERTIES dsvHeapProp(D3D12_HEAP_TYPE_DEFAULT);
-	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
-
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = sDepthStencilFormat;
-	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-	RenderContext::GetDevice()->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, mDSHeap->GetCPUDescriptorHandleForHeapStart());
-
-	return true;
-}
-
 bool Window::ReleaseSwapChainBuffers()
 {
 	for (int i = 0; i < sSwapChainBufferCount; i++) 
@@ -282,13 +228,6 @@ bool Window::ReleaseSwapChainBuffers()
 		mSwapChainBuffers[i]->Release();
 		mSwapChainBuffers[i] = nullptr;
 	}
-	return true;
-}
-
-bool Window::ReleaseDepthStencilBuffer()
-{
-	mDepthStencilBuffer->Release();
-	mDepthStencilBuffer = nullptr;
 	return true;
 }
 

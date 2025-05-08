@@ -24,10 +24,10 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	D12PipelineObject pso(vs, ps, rootSig);
 	D12ComputePipelineObject computePso(compute, pso);
 
-	Camera cam({ 0.0f, 1.0f, -10.0f }, { 0.0f, 1.0f, 0.0f }, window.GetAspectRatio());
+	Camera cam({ 0.0f, 3.5f, -10.0f }, { 0.0f, 1.0f, 0.0f }, window.GetAspectRatio());
 
-	Geometry cubeGeo = GeometryFactory::CreateCubeGeo();
-	Transform cubeTransform({ 0.0f, 0.0f, 0.0f }, { 0.0f, 45.0f, 0.0f }, { 2.0f, 2.0f, 2.0f });
+	Geometry cubeGeo = GeometryFactory::LoadGeometry(R"(C:\Users\mitha\Documents\github\DirectXLab\Resources\barrel_large_decorated.obj)");
+	Transform cubeTransform({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 2.0f, 2.0f, 2.0f });
 	cubeTransform.UpdateTransformMatrix();
 
 	RenderTarget target(window.GetWidth(), window.GetHeight());
@@ -55,8 +55,8 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 		RenderContext::EndFrame();
 		window.Display();
 
-		cubeTransform.Rotate(0,  0.0008f, 0.0f);
-		cubeTransform.mPos = { 0.0f, static_cast<float>(std::sin(t)), 0.0f };
+		cubeTransform.Rotate(0.0f,  0.008f, 0.0f);
+		cubeTransform.mPos = { 0, 0.0f, 0.0f };
 		cubeTransform.UpdateTransformMatrix();
 
 	}

@@ -141,6 +141,7 @@
     <ClInclude Include="DynamicBuffer.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GeometryFactory.h" />
+    <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ReadbackBuffer.hpp" />
     <ClInclude Include="RenderContext.h" />

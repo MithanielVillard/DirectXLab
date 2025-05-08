@@ -26,12 +26,8 @@ protected:
 	IDXGISwapChain* mSwapChain;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE mRtvHandles[sSwapChainBufferCount];
-
 	ID3D12Resource* mSwapChainBuffers[sSwapChainBufferCount];
-	ID3D12Resource* mDepthStencilBuffer;
-
 	ID3D12DescriptorHeap* mSCBuffersHeap;
-	ID3D12DescriptorHeap* mDSHeap;
 
 	D3D12_VIEWPORT mViewPort;
 	D3D12_RECT mScissorRect;
@@ -61,12 +57,8 @@ private:
 	bool CreateSwapChain();
 
 	bool CreateSwapChainBuffersHeap();
-	bool CreateDepthStencilHeap();
 
 	bool RetrieveSwapChainBuffers();
-	bool RetrieveDepthStencilBuffer();
-
 	bool ReleaseSwapChainBuffers();
-	bool ReleaseDepthStencilBuffer();
 };
 
