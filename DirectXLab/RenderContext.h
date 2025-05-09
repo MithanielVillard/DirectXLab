@@ -24,6 +24,7 @@ public:
 	inline static uint sRtvDescriptorSize;
 	inline static uint sDsvDescriptorSize;
 	inline static uint sCbvSrvUavDescriptorSize;
+	inline static float sDeltaTime;
 
 private:
 	RenderContext() = default;

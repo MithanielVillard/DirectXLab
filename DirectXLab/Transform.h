@@ -25,11 +25,11 @@ public:
 	XMFLOAT3 mPos;
 	XMFLOAT4 mQuaternionRot;
 	XMFLOAT3 mScale;
+	XMMATRIX mMatrix;
 private:
 
 	DynamicBuffer mBuffer = DynamicBuffer(sizeof(ObjectData));
 
-	XMFLOAT4X4 mMatrix;
 
 	friend class RenderWindow;
 	friend class RenderTarget;

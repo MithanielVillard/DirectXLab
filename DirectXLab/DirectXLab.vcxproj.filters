@@ -78,6 +78,9 @@
     <ClInclude Include="OBJ_Loader.h">
       <Filter>Libs</Filter>
     </ClInclude>
+    <ClInclude Include="Chrono.h">
+      <Filter>Libs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -124,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="RenderTarget.cpp">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Chrono.cpp">
+      <Filter>Libs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

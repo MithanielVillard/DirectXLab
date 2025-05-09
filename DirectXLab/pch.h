@@ -30,6 +30,7 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "Comctl32.lib")
+#pragma comment(lib, "winmm.lib")
 
 // == Typedefs ==
 #undef byte

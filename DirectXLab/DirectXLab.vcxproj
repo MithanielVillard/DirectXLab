@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Chrono.h" />
     <ClInclude Include="D12ComputePipelineObject.h" />
     <ClInclude Include="D12DebugLayer.h" />
     <ClInclude Include="D12PipelineObject.h" />
@@ -155,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Chrono.cpp" />
     <ClCompile Include="D12ComputePipelineObject.cpp" />
     <ClCompile Include="D12DebugLayer.cpp" />
     <ClCompile Include="D12PipelineObject.cpp" />

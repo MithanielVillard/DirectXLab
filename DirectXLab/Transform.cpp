@@ -27,12 +27,12 @@ void Transform::Rotate(const float x, const float y, const float z)
 
 void Transform::UpdateTransformMatrix()
 {
-	XMMATRIX world =
+	mMatrix = XMMatrixTranspose(
 		XMMatrixScaling(mScale.x, mScale.y, mScale.z) *
 		XMMatrixRotationQuaternion(XMLoadFloat4(&mQuaternionRot)) *
-		XMMatrixTranslation(mPos.x, mPos.y, mPos.z);
+		XMMatrixTranslation(mPos.x, mPos.y, mPos.z));
 
-	ObjectData data = { XMMatrixTranspose(world) };
+	ObjectData data = { mMatrix };
 	mBuffer.CopyData(data);
 }
 

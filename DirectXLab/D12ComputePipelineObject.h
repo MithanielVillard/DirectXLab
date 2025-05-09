@@ -18,5 +18,6 @@ private:
 	ID3D12PipelineState* mPipelineState = nullptr;
 
 	friend class RenderWindow;
+	friend class RenderTarget;
 };
 
