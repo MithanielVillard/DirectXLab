@@ -5,6 +5,7 @@
 #include "D12ComputePipelineObject.h"
 #include "D12PipelineObject.h"
 #include "Geometry.h"
+#include "ParticleEmitter.h"
 #include "RenderContext.h"
 #include "Transform.h"
 #include "Window.h"
@@ -186,16 +187,19 @@ void RenderTarget::Begin(Camera const& camera)
 	mCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 }
 
-void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, D3D12_GPU_VIRTUAL_ADDRESS addr,
+void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, ParticleEmitter& emitter,
 	D12ComputePipelineObject const* computePso)
 {
 
 	//== Compute shader ==
 	mCommandList->SetPipelineState(computePso->mPipelineState);
 	mCommandList->SetComputeRootSignature(pso.mRootSignature);
-	mCommandList->SetComputeRootUnorderedAccessView(3, addr);
 
-	mCommandList->SetComputeRoot32BitConstant(4, reinterpret_cast<uint&>(RenderContext::sDeltaTime), 0);
+	mCommandList->SetDescriptorHeaps(1, &emitter.mDescriptorHeap);
+
+	mCommandList->SetComputeRoot32BitConstant(2, reinterpret_cast<uint&>(RenderContext::sDeltaTime), 0);
+	mCommandList->SetComputeRootDescriptorTable(3, emitter.mDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+
 	mCommandList->Dispatch(1, 1, 1);
 	// =====
 
@@ -204,7 +208,7 @@ void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 
 	mCommandList->SetGraphicsRootConstantBufferView(0, transform.mBuffer.GetGPUAddress());
 	mCommandList->SetGraphicsRootConstantBufferView(1, mpCamera->mBuffer.GetGPUAddress());
-	mCommandList->SetGraphicsRootShaderResourceView(2, addr);
+	mCommandList->SetGraphicsRootDescriptorTable(3, emitter.mDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBuffer = geo.GetVertexBufferView();
 	D3D12_INDEX_BUFFER_VIEW indexBuffer = geo.GetIndexBufferView();
@@ -213,7 +217,7 @@ void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 	mCommandList->IASetIndexBuffer(&indexBuffer);
 	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 20, 0, 0, 0);
+	mCommandList->DrawIndexedInstanced(geo.GetIndicesCount(), 5, 0, 0, 0);
 }
 
 void RenderTarget::End()

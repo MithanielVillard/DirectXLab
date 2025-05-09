@@ -6,6 +6,7 @@
 #include "D12PipelineObject.h"
 #include "Geometry.h"
 #include "GeometryFactory.h"
+#include "ParticleEmitter.h"
 #include "RenderContext.h"
 #include "RenderTarget.h"
 #include "RenderWindow.h"
@@ -46,13 +47,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
 
 	// =========
-	StaticBuffer transformsBuffer;
-	XMMATRIX transforms[32] = {
-		//cubeTransform.mMatrix,
-		//cubeTransform2.mMatrix
-	};
-	transformsBuffer.Init(transforms, sizeof(XMMATRIX) * _countof(transforms));
-	transformsBuffer.SetName(L"Transform buffer");
+	ParticleEmitter emitter(5);
 	// ========
 
 
@@ -67,7 +62,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 
 		//Render Target
 		target.Begin(cam);
-		target.Draw(cubeGeo, pso, cubeTransform, transformsBuffer.GetGPUAddress(), &computePso);
+		target.Draw(cubeGeo, pso, cubeTransform, emitter, &computePso);
 		target.End();
 
 		window.BeginDraw(cam);

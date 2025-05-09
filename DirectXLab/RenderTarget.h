@@ -20,7 +20,7 @@ public:
 	~RenderTarget();
 
 	void Begin(const Camera& camera);
-	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, D3D12_GPU_VIRTUAL_ADDRESS addr, D12ComputePipelineObject
+	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, ParticleEmitter& emitter, D12ComputePipelineObject
 	          const* computePso);
 	void End();
 

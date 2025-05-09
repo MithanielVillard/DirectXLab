@@ -14,6 +14,8 @@ private:
 	ID3D12Resource* mUploadBuffer;
 
 	D3D12_SUBRESOURCE_DATA mSubResourceData {};
+
 	friend class RenderContext;
+	friend class ParticleEmitter;
 };
 

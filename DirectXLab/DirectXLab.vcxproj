@@ -143,6 +143,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GeometryFactory.h" />
     <ClInclude Include="OBJ_Loader.h" />
+    <ClInclude Include="ParticleEmitter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ReadbackBuffer.hpp" />
     <ClInclude Include="RenderContext.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GeometryFactory.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="RenderContext.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="RenderWindow.cpp" />

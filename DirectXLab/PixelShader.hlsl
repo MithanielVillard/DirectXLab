@@ -1,7 +1,5 @@
 #include "Common.hlsli"
 
-RWStructuredBuffer<int> srcBuffer : register(u0);
-
 float4 main(VertexOut vIn) : SV_TARGET
 {
 

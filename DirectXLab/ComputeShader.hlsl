@@ -1,15 +1,16 @@
-RWStructuredBuffer<float4x4> transforms : register(u0);
 
 cbuffer simulationTime : register(b2)
 {
     float time;
 }
 
+RWStructuredBuffer<float4x4> transforms : register(u0);
+
 [numthreads(32, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
 
-    float3 pos = float3(DTid.x-5.0f, time-5.0f, 0.0f);
+    float3 pos = float3(DTid.x, time, 0.0f);
 
     float4x4 world =
     {
