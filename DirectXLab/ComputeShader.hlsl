@@ -4,6 +4,11 @@ cbuffer simulationTime : register(b2)
     float time;
 }
 
+cbuffer simulationParameters : register(b3)
+{
+    float3 emitterPos;
+}
+
 RWStructuredBuffer<float4x4> transforms : register(u0);
 
 [numthreads(32, 1, 1)]

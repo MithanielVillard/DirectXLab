@@ -1,10 +1,15 @@
 #pragma once
-#include "StaticBuffer.h"
+#include "DynamicBuffer.h"
 
 struct Particle
 {
 	DirectX::XMMATRIX transform;
  };
+
+struct SimulationParameter
+{
+	DirectX::XMFLOAT3 emitterPos;
+};
 
 class ParticleEmitter
 {
@@ -15,6 +20,7 @@ public:
 private:
 	ID3D12DescriptorHeap* mDescriptorHeap;
 	ID3D12Resource* mResource;
+	DynamicBuffer mParametersBuffer;
 
 	uint maxParticle;
 

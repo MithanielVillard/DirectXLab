@@ -10,4 +10,5 @@
 "CBV(b1), " \
 "RootConstants(num32BitConstants=1, b2), " \
 "DescriptorTable(SRV(t0), " \
-                "UAV(u0))" 
+                "UAV(u0), " \
+                "CBV(b3))" 
