@@ -9,9 +9,9 @@ class RenderContext
 public:
 	static bool Init();
 	static void FlushCommandQueue();
-	static void EndFrame();
-	static void UploadBuffer(StaticBuffer& buffer);
+	static void ExecuteLists();
 	static void AddPendingList(ID3D12CommandList* pList) { Instance().mPendingLists.push_back(pList); }
+	static void UploadBuffer(StaticBuffer& buffer);
 
 	static void SetMSAA(const uint count) { Instance().mMSAACount = count; }
 
@@ -40,15 +40,15 @@ private:
 
 private:
 
-	IDXGIFactory* mDxgiFactory;
-	ID3D12Device* mDevice;
+	IDXGIFactory* mDxgiFactory = nullptr;
+	ID3D12Device* mDevice = nullptr;
 
-	ID3D12Fence* mFence;
+	ID3D12Fence* mFence = nullptr;
 	ulong mCurrentFenceValue = 0;
 
-	ID3D12CommandQueue* mCommandQueue;
-	ID3D12CommandAllocator* mCommandAllocator;
-	ID3D12GraphicsCommandList* mCommandList;
+	ID3D12CommandQueue* mCommandQueue = nullptr;
+	ID3D12CommandAllocator* mCommandAllocator = nullptr;
+	ID3D12GraphicsCommandList* mCommandList = nullptr;
 
 	std::vector<ID3D12CommandList*> mPendingLists;
 

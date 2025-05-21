@@ -1,5 +1,6 @@
 #pragma once
 #include "StaticBuffer.h"
+
 struct Vertex;
 
 class Geometry

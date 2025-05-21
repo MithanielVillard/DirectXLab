@@ -185,8 +185,7 @@ void RenderTarget::Begin(Camera const& camera)
 	mCommandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 }
 
-void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform,
-	D12ComputePipelineObject const* computePso)
+void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform)
 {
 	mCommandList->SetGraphicsRootSignature(pso.mRootSignature);
 	mCommandList->SetPipelineState(pso.mPipelineState);

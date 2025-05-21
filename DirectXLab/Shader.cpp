@@ -25,6 +25,20 @@ Shader::Shader(std::string_view const path)
 	}
 }
 
+Shader::Shader(Shader const& other)
+{
+	mSize = other.mSize;
+	mData = malloc(other.mSize);
+	memcpy(mData, other.mData, other.mSize);
+}
+
+Shader::Shader(Shader&& other) noexcept
+{
+	mSize = other.mSize;
+	mData = other.mData;
+	other.mData = nullptr;
+}
+
 Shader::~Shader()
 {
 	free(mData);

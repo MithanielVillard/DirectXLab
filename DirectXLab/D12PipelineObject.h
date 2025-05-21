@@ -8,8 +8,8 @@ public:
 	~D12PipelineObject();
 
 private:
-	ID3D12PipelineState* mPipelineState;
-	ID3D12RootSignature* mRootSignature;
+	ID3D12PipelineState* mPipelineState = nullptr;
+	ID3D12RootSignature* mRootSignature = nullptr;
 
 	D3D12_INPUT_ELEMENT_DESC inputLayout[3]
 	{

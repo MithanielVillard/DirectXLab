@@ -17,7 +17,7 @@ public:
 	~RenderTarget();
 
 	void Begin(const Camera& camera);
-	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform, D12ComputePipelineObject const* computePso);
+	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform);
 	void End();
 
 	void Resize(uint width, uint height);

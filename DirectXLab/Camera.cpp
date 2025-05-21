@@ -9,7 +9,18 @@ Camera::Camera(XMFLOAT3 const& pos, XMFLOAT3 const& up, float const aspectRatio,
 
 void Camera::SetAspectRatio(float aspectRatio)
 {
-	XMStoreFloat4x4(&mProjMatrix, XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 500.0f));
+	//Calculate projection matrix only where the aspect ratio change
+	switch (mType)
+	{
+	case PERSPECTIVE:
+		XMStoreFloat4x4(&mProjMatrix, XMMatrixPerspectiveFovLH(XM_PIDIV4, aspectRatio, 0.1f, 500.0f));
+		break;
+
+	case ORTHOGRAPHIC:
+		//XMStoreFloat4x4(&mProjMatrix, XMMatrixOrthographicLH());
+		break;
+
+	}
 	UpdateVPMatrix();
 }
 

@@ -82,11 +82,11 @@ void RenderContext::FlushCommandQueue()
 	}
 }
 
-void RenderContext::EndFrame()
+void RenderContext::ExecuteLists()
 {
 	RenderContext& context = Instance();
 	context.mCommandQueue->ExecuteCommandLists(static_cast<UINT>(context.mPendingLists.size()), context.mPendingLists.data());
-	FlushCommandQueue();
+	//FlushCommandQueue();
 	context.mPendingLists.clear();
 }
 

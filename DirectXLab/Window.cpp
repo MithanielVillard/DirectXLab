@@ -25,6 +25,7 @@ Window::~Window()
 	mCommandAllocator->Release();
 	mCommandList->Release();
 	mSwapChain->Release();
+	mFence->Release();
 
 	for (ID3D12Resource* buffer : mSwapChainBuffers) buffer->Release();
 
@@ -32,6 +33,21 @@ Window::~Window()
 
 	DestroyWindow(mWindowHandle);
 	UnregisterClassW(reinterpret_cast<LPCWSTR>(mWindowClass), mHInstance);
+}
+
+void Window::FlushCmdQueue()
+{
+	RenderContext::GetCommandQueue()->Signal(mFence, ++mFenceValue);
+
+	if (mFence->GetCompletedValue() < mFenceValue)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, L"", false, EVENT_ALL_ACCESS);
+
+		mFence->SetEventOnCompletion(mFenceValue, eventHandle);
+
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
 }
 
 LRESULT Window::MainWndProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam)
@@ -92,6 +108,7 @@ void Window::ResizeWindow(int const newWidth, int const newHeight)
 	mCurrentBackBuffer = 0;
 
 	if (mResizeCallBack) mResizeCallBack(this);
+	OnWindowResize();
 }
 
 bool Window::CreateWindowClass(std::wstring_view title, int width, int height)
@@ -148,6 +165,13 @@ bool Window::CreateCmdObjects()
 	}
 
 	mCommandList->Close();
+
+	res = device->CreateFence(mFenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to create window fence", res);
+		return false;
+	}
 
 	return true;
 }

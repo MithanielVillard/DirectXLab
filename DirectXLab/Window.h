@@ -5,6 +5,12 @@ class Window
 {
 public:
 	Window(std::wstring_view title, int width, int height);
+	Window(Window const& other) = delete;
+	Window(Window&& other) noexcept = delete;
+
+	auto operator=(Window const& other) = delete;
+	auto operator=(Window&& other) = delete;
+
 	virtual ~Window();
 
 	void Update() const;
@@ -14,7 +20,7 @@ public:
 	int GetHeight() const { return mHeight; }
 	float GetAspectRatio() const { return static_cast<float>(mWidth) / static_cast<float>(mHeight); }
 
-	void OnWindowResize(std::function<void(Window*)> const& func) { mResizeCallBack = func; }
+	void OnWindowResizeCallBack(std::function<void(Window*)> const& func) { mResizeCallBack = func; }
 
 	static constexpr DXGI_FORMAT sBackBufferFormat{ DXGI_FORMAT_R8G8B8A8_UNORM };
 	static constexpr DXGI_FORMAT sDepthStencilFormat{ DXGI_FORMAT_D24_UNORM_S8_UINT };
@@ -22,16 +28,19 @@ public:
 	inline static const DirectX::XMVECTORF32 sClearColor{ DirectX::Colors::LightBlue };
 
 protected:
-	ID3D12GraphicsCommandList* mCommandList;
-	ID3D12CommandAllocator* mCommandAllocator;
+	ID3D12GraphicsCommandList* mCommandList = nullptr;
+	ID3D12CommandAllocator* mCommandAllocator = nullptr;
 
 	static constexpr int sSwapChainBufferCount { 2 };
 	int mCurrentBackBuffer = 0;
-	IDXGISwapChain* mSwapChain;
+	IDXGISwapChain* mSwapChain = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE mRtvHandles[sSwapChainBufferCount];
 	ID3D12Resource* mSwapChainBuffers[sSwapChainBufferCount];
-	ID3D12DescriptorHeap* mSCBuffersHeap;
+	ID3D12DescriptorHeap* mSCBuffersHeap = nullptr;
+
+	ID3D12Fence* mFence = nullptr;
+	ulong mFenceValue = 0;
 
 	D3D12_VIEWPORT mViewPort;
 	D3D12_RECT mScissorRect;
@@ -48,6 +57,8 @@ protected:
 
 protected:
 	ID3D12Resource* GetCurrentBackBuffer() const { return mSwapChainBuffers[mCurrentBackBuffer]; }
+	virtual void OnWindowResize() {};
+	void FlushCmdQueue();
 
 private:
 	static LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
