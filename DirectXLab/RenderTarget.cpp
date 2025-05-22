@@ -162,7 +162,7 @@ void RenderTarget::Resize(uint width, uint height)
 	RetrieveDSBuffer();
 }
 
-void RenderTarget::Begin(Camera const& camera)
+void RenderTarget::Begin3D(Camera const& camera)
 {
 	mpCamera = &camera;
 

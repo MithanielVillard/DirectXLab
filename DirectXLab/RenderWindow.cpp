@@ -7,7 +7,7 @@
 
 RenderWindow::RenderWindow(std::wstring_view const title, int const width, int const height) : Window(title, width, height) {}
 
-void RenderWindow::BeginDraw(Camera const& camera)
+void RenderWindow::Begin3D(Camera const& camera)
 {
 	mCommandAllocator->Reset();
 	mCommandList->Reset(mCommandAllocator, nullptr);
@@ -15,7 +15,7 @@ void RenderWindow::BeginDraw(Camera const& camera)
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RESOLVE_DEST);
 	mCommandList->ResourceBarrier(1, &barrier);
 
-	mTarget.Begin(camera);
+	mTarget.Begin3D(camera);
 
 }
 

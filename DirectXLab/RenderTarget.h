@@ -16,7 +16,7 @@ public:
 
 	~RenderTarget();
 
-	void Begin(const Camera& camera);
+	void Begin3D(const Camera& camera);
 	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform);
 	void End();
 

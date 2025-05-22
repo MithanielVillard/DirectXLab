@@ -28,7 +28,7 @@ public:
 
 	~RenderWindow() override = default;
 
-	void BeginDraw(Camera const& camera);
+	void Begin3D(Camera const& camera);
 	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform);
 	void EndDraw();
 

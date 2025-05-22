@@ -22,6 +22,8 @@ Window::Window(std::wstring_view title, int width, int height) : mHInstance(GetM
 
 Window::~Window()
 {
+	FlushCmdQueue();
+
 	mCommandAllocator->Release();
 	mCommandList->Release();
 	mSwapChain->Release();

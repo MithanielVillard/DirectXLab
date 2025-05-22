@@ -17,7 +17,7 @@ void Camera::SetAspectRatio(float aspectRatio)
 		break;
 
 	case ORTHOGRAPHIC:
-		//XMStoreFloat4x4(&mProjMatrix, XMMatrixOrthographicLH());
+		XMStoreFloat4x4(&mProjMatrix, XMMatrixOrthographicLH(9.0f, 7.0f, 0.1f, 500.0f));
 		break;
 
 	}

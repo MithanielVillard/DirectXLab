@@ -28,6 +28,7 @@ public:
 	inline static const DirectX::XMVECTORF32 sClearColor{ DirectX::Colors::LightBlue };
 
 protected:
+	//ID3D12CommandQueue* mCommandQueue = nullptr;
 	ID3D12GraphicsCommandList* mCommandList = nullptr;
 	ID3D12CommandAllocator* mCommandAllocator = nullptr;
 

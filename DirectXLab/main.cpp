@@ -25,7 +25,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 	D12PipelineObject pso(vs, ps, rootSig);
 	D12ComputePipelineObject computePso(compute, pso);
 
-	Camera cam({ 0.0f, 1.0f, -10.0f }, { 0.0f, 1.0f, 0.0f }, window.GetAspectRatio());
+	Camera cam({ 0.0f, 1.0f, -10.0f }, { 0.0f, 1.0f, 0.0f }, window.GetAspectRatio(), PERSPECTIVE);
 
 	Geometry cubeGeo = GeometryFactory::CreateCubeGeo();
 	Transform cubeTransform({ 0.0f, 0.0f, 0.0f }, { 0.0f, 45.0f, 0.0f }, { 2.0f, 2.0f, 2.0f });
@@ -36,11 +36,12 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 			cam.SetAspectRatio(w->GetAspectRatio());
 	});
 
+
 	while (window.IsOpen())
 	{
 		window.Update();
 
-		window.BeginDraw(cam);
+		window.Begin3D(cam);
 		window.Draw(cubeGeo, pso, cubeTransform);
 		window.EndDraw();
 
