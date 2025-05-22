@@ -1,5 +1,6 @@
 #pragma once
 
+class Window;
 class D12ComputePipelineObject;
 class Transform;
 class D12PipelineObject;
@@ -10,13 +11,16 @@ class RenderTarget
 {
 public:
 
-	RenderTarget(uint width, uint height);
-	RenderTarget(RenderTarget const& other);
+	RenderTarget(uint width, uint height, Window& window);
+	RenderTarget(RenderTarget const& other) = delete;
 	RenderTarget(RenderTarget&&) noexcept = delete;
+
+	auto operator=(RenderTarget const& other) = delete;
+	auto operator=(RenderTarget&& other) = delete;
 
 	~RenderTarget();
 
-	void Begin3D(const Camera& camera);
+	void Begin3D(Camera const& camera);
 	void Draw(Geometry& geo, D12PipelineObject const& pso, Transform const& transform);
 	void End();
 
@@ -47,7 +51,9 @@ protected:
 	uint mHeight;
 
 	Camera const* mpCamera;
+	Window* mWindow;
 
 	friend class RenderWindow;
+	friend class Window;
 };
 

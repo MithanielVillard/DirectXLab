@@ -28,9 +28,11 @@ public:
 	inline static const DirectX::XMVECTORF32 sClearColor{ DirectX::Colors::LightBlue };
 
 protected:
-	//ID3D12CommandQueue* mCommandQueue = nullptr;
+	ID3D12CommandQueue* mCommandQueue = nullptr;
 	ID3D12GraphicsCommandList* mCommandList = nullptr;
 	ID3D12CommandAllocator* mCommandAllocator = nullptr;
+
+	std::vector<ID3D12CommandList*> mPendingLists;
 
 	static constexpr int sSwapChainBufferCount { 2 };
 	int mCurrentBackBuffer = 0;
@@ -59,12 +61,13 @@ protected:
 protected:
 	ID3D12Resource* GetCurrentBackBuffer() const { return mSwapChainBuffers[mCurrentBackBuffer]; }
 	virtual void OnWindowResize() {};
+	void ExecuteLists();
 	void FlushCmdQueue();
+	void AddPendingList(ID3D12GraphicsCommandList* list) { mPendingLists.push_back(list); }
 
 private:
 	static LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK SubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
-
 
 	LRESULT HandleEvent(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void ResizeViewport();
@@ -78,5 +81,8 @@ private:
 
 	bool RetrieveSwapChainBuffers();
 	bool ReleaseSwapChainBuffers();
+
+
+	friend class RenderTarget;
 };
 

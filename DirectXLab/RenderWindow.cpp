@@ -12,7 +12,9 @@ void RenderWindow::Begin3D(Camera const& camera)
 	mCommandAllocator->Reset();
 	mCommandList->Reset(mCommandAllocator, nullptr);
 
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RESOLVE_DEST);
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(),
+		D3D12_RESOURCE_STATE_PRESENT,  
+		RenderContext::GetMSAACount() == NONE ? D3D12_RESOURCE_STATE_COPY_DEST : D3D12_RESOURCE_STATE_RESOLVE_DEST);
 	mCommandList->ResourceBarrier(1, &barrier);
 
 	mTarget.Begin3D(camera);
@@ -26,20 +28,29 @@ void RenderWindow::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 
 void RenderWindow::EndDraw()
 {
-	//use CopyResource() to copy resource without MSAA
-	//mCommandList->CopyResource(mSwapChainBuffers[mCurrentBackBuffer], rt.mRenderTargetBuffer);
 	mTarget.End();
 
-	mCommandList->ResolveSubresource(mSwapChainBuffers[mCurrentBackBuffer], 0, mTarget.mRenderTargetBuffer, 0, sBackBufferFormat);
+	switch (RenderContext::GetMSAACount())
+	{
+		case NONE:
+			//use CopyResource() to copy resource without MSAA
+			mCommandList->CopyResource(mSwapChainBuffers[mCurrentBackBuffer], mTarget.mRenderTargetBuffer);
+			break;
 
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(), D3D12_RESOURCE_STATE_RESOLVE_DEST, D3D12_RESOURCE_STATE_PRESENT);
+		default:
+			mCommandList->ResolveSubresource(mSwapChainBuffers[mCurrentBackBuffer], 0, mTarget.mRenderTargetBuffer, 0, sBackBufferFormat);
+			break;
+	}
+
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(GetCurrentBackBuffer(), 
+		RenderContext::GetMSAACount() == NONE ? D3D12_RESOURCE_STATE_COPY_DEST : D3D12_RESOURCE_STATE_RESOLVE_DEST,
+		D3D12_RESOURCE_STATE_PRESENT);
 	mCommandList->ResourceBarrier(1, &barrier);
 
 	mCommandList->Close();
-	RenderContext::AddPendingList(mCommandList);
-	RenderContext::ExecuteLists();
 
-	FlushCmdQueue();
+	AddPendingList(mCommandList);
+	ExecuteLists();
 
 	mSwapChain->Present(0, 0);
 	mCurrentBackBuffer = (mCurrentBackBuffer + 1) % sSwapChainBufferCount;

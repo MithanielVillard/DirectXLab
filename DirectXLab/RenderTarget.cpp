@@ -8,7 +8,7 @@
 #include "Transform.h"
 #include "Window.h"
 
-RenderTarget::RenderTarget(uint const width, uint const height) : mWidth(width), mHeight(height)
+RenderTarget::RenderTarget(uint const width, uint const height, Window& window) : mWidth(width), mHeight(height), mWindow(&window)
 {
 	HRESULT res = RenderContext::GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
 	if (FAILED(res))
@@ -70,7 +70,12 @@ void RenderTarget::RetrieveDSBuffer()
 	optClear.DepthStencil.Depth = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
 
-	RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
+	HRESULT res = RenderContext::GetDevice()->CreateCommittedResource(&dsvHeapProp, D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &optClear, IID_PPV_ARGS(&mDepthStencilBuffer));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to retrieve DSV on render target", res);
+		return;
+	}
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 	dsvDesc.Format = Window::sDepthStencilFormat;
@@ -117,7 +122,7 @@ void RenderTarget::RetrieveRTBuffer()
 		&heapProp,
 		D3D12_HEAP_FLAG_NONE,
 		&resourceDesc,
-		D3D12_RESOURCE_STATE_RESOLVE_SOURCE,
+		RenderContext::GetMSAACount() == NONE ? D3D12_RESOURCE_STATE_COPY_SOURCE : D3D12_RESOURCE_STATE_RESOLVE_SOURCE,
 		&optClear,
 		IID_PPV_ARGS(&mRenderTargetBuffer)
 	);
@@ -169,7 +174,9 @@ void RenderTarget::Begin3D(Camera const& camera)
 	mCommandAllocator->Reset();
 	mCommandList->Reset(mCommandAllocator, nullptr);
 
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mRenderTargetBuffer, D3D12_RESOURCE_STATE_RESOLVE_SOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mRenderTargetBuffer,  
+		 RenderContext::GetMSAACount() == NONE ? D3D12_RESOURCE_STATE_COPY_SOURCE : D3D12_RESOURCE_STATE_RESOLVE_SOURCE, 
+		D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	mCommandList->ResourceBarrier(1, &barrier);
 
@@ -205,17 +212,13 @@ void RenderTarget::Draw(Geometry& geo, D12PipelineObject const& pso, Transform c
 
 void RenderTarget::End()
 {
-	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mRenderTargetBuffer, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(mRenderTargetBuffer, 
+		D3D12_RESOURCE_STATE_RENDER_TARGET, 
+		 RenderContext::GetMSAACount() == NONE ? D3D12_RESOURCE_STATE_COPY_SOURCE : D3D12_RESOURCE_STATE_RESOLVE_SOURCE);
 	mCommandList->ResourceBarrier(1, &barrier);
 
 	mCommandList->Close();
-	RenderContext::AddPendingList(mCommandList);
-}
-
-RenderTarget::RenderTarget(RenderTarget const& other)
-{
-	mRenderTargetBuffer = other.mRenderTargetBuffer;
-	mRenderTargetBuffer->AddRef();
+	mWindow->AddPendingList(mCommandList);
 }
 
 RenderTarget::~RenderTarget()

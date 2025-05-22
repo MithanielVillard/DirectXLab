@@ -24,6 +24,7 @@ Window::~Window()
 {
 	FlushCmdQueue();
 
+	mCommandQueue->Release();
 	mCommandAllocator->Release();
 	mCommandList->Release();
 	mSwapChain->Release();
@@ -37,9 +38,16 @@ Window::~Window()
 	UnregisterClassW(reinterpret_cast<LPCWSTR>(mWindowClass), mHInstance);
 }
 
+void Window::ExecuteLists()
+{
+	mCommandQueue->ExecuteCommandLists(static_cast<UINT>(mPendingLists.size()), mPendingLists.data());
+	FlushCmdQueue();
+	mPendingLists.clear();
+}
+
 void Window::FlushCmdQueue()
 {
-	RenderContext::GetCommandQueue()->Signal(mFence, ++mFenceValue);
+	mCommandQueue->Signal(mFence, ++mFenceValue);
 
 	if (mFence->GetCompletedValue() < mFenceValue)
 	{
@@ -99,7 +107,7 @@ void Window::ResizeViewport()
 
 void Window::ResizeWindow(int const newWidth, int const newHeight)
 {
-	RenderContext::FlushCommandQueue();
+	FlushCmdQueue();
 
 	ReleaseSwapChainBuffers();
 
@@ -152,7 +160,19 @@ bool Window::CreateCmdObjects()
 {
 	ID3D12Device* device = RenderContext::GetDevice();
 
-	HRESULT res = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
+	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+	queueDesc.NodeMask = 0;
+	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+	HRESULT res = device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
+	if (FAILED(res))
+	{
+		PRINT_COM_ERROR("Failed to create command queue", res);
+		return false;
+	}
+
+	res = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create command allocator", res);
@@ -197,7 +217,7 @@ bool Window::CreateSwapChain()
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	HRESULT res = RenderContext::GetDXGIFactory()->CreateSwapChain(RenderContext::GetCommandQueue(), &sd, &mSwapChain);
+	HRESULT res = RenderContext::GetDXGIFactory()->CreateSwapChain(mCommandQueue, &sd, &mSwapChain);
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Failed to create swap chain", res);

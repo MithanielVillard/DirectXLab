@@ -24,7 +24,7 @@ public:
 	RenderWindow(RenderWindow&& other) noexcept = delete;
 
 	auto operator=(RenderWindow const& other) = delete;
-	auto operator=(RenderWindow&& other) = delete;
+	auto operator=(RenderWindow&& other) = delete; 
 
 	~RenderWindow() override = default;
 
@@ -33,7 +33,7 @@ public:
 	void EndDraw();
 
 private:
-	RenderTarget mTarget = RenderTarget(mWidth, mHeight);
+	RenderTarget mTarget = RenderTarget(mWidth, mHeight, *this);
 
 private:
 	void OnWindowResize() override;

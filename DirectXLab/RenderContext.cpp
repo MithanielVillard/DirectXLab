@@ -7,8 +7,14 @@
 bool RenderContext::Init()
 {
 	RenderContext& context = Instance();
+	HRESULT res; 
 
-	HRESULT res = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG,IID_PPV_ARGS(&context.mDxgiFactory));
+#ifdef _DEBUG
+	res = CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&context.mDxgiFactory));
+#else
+	res = CreateDXGIFactory(IID_PPV_ARGS(&context.mDxgiFactory));
+#endif
+
 	if (FAILED(res))
 	{
 		PRINT_COM_ERROR("Error while creating factory", res);
@@ -80,14 +86,6 @@ void RenderContext::FlushCommandQueue()
 		WaitForSingleObject(eventHandle, INFINITE);
 		CloseHandle(eventHandle);
 	}
-}
-
-void RenderContext::ExecuteLists()
-{
-	RenderContext& context = Instance();
-	context.mCommandQueue->ExecuteCommandLists(static_cast<UINT>(context.mPendingLists.size()), context.mPendingLists.data());
-	//FlushCommandQueue();
-	context.mPendingLists.clear();
 }
 
 void RenderContext::UploadBuffer(StaticBuffer& buffer)

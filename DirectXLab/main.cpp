@@ -13,7 +13,7 @@
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
 {
 	RenderContext::Init();
-	RenderContext::SetMSAA(2);
+	RenderContext::SetMSAA(MSAA_COUNT_X2);
 
 	RenderWindow window(L"Window 1", 900, 700);
 
@@ -42,10 +42,10 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 		window.Update();
 
 		window.Begin3D(cam);
-		window.Draw(cubeGeo, pso, cubeTransform);
+			window.Draw(cubeGeo, pso, cubeTransform);
 		window.EndDraw();
 
-		//cubeTransform.Rotate(0.0f,  0.0008f, 0.0f);
-		//cubeTransform.UpdateTransformMatrix();
+		cubeTransform.Rotate(0.0f,  0.0008f, 0.0f);
+		cubeTransform.UpdateTransformMatrix();
 	}
 }
