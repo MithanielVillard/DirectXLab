@@ -4,6 +4,7 @@
 class Window
 {
 public:
+	Window() = default;
 	Window(std::wstring_view title, int width, int height);
 	Window(Window const& other) = delete;
 	Window(Window&& other) noexcept = delete;
@@ -12,6 +13,8 @@ public:
 	auto operator=(Window&& other) = delete;
 
 	virtual ~Window();
+
+	void Create(std::wstring_view title, int width, int height);
 
 	void Update() const;
 

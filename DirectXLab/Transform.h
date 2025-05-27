@@ -27,7 +27,7 @@ public:
 	XMFLOAT3 mScale;
 private:
 
-	DynamicBuffer mBuffer = DynamicBuffer(sizeof(ObjectData));
+	DynamicBuffer mBuffer { sizeof(ObjectData) };
 
 	XMFLOAT4X4 mMatrix;
 

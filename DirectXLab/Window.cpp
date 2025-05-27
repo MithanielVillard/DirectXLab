@@ -6,18 +6,7 @@
 Window::Window(std::wstring_view title, int width, int height) : mHInstance(GetModuleHandle(nullptr)),
                                                                  mWindowHandle(nullptr), mWidth(width), mHeight(height)
 {
-	CreateWindowClass(title, width, height);
-	CreateCmdObjects();
-	CreateSwapChain();
-
-	CreateSwapChainBuffersHeap();
-
-	RetrieveSwapChainBuffers();
-
-	ShowWindow(mWindowHandle, SW_SHOW);
-	UpdateWindow(mWindowHandle);
-
-	mIsOpen = true;
+	Create(title, width, height);
 }
 
 Window::~Window()
@@ -36,6 +25,22 @@ Window::~Window()
 
 	DestroyWindow(mWindowHandle);
 	UnregisterClassW(reinterpret_cast<LPCWSTR>(mWindowClass), mHInstance);
+}
+
+void Window::Create(std::wstring_view title, int width, int height)
+{
+	CreateWindowClass(title, width, height);
+	CreateCmdObjects();
+	CreateSwapChain();
+
+	CreateSwapChainBuffersHeap();
+
+	RetrieveSwapChainBuffers();
+
+	ShowWindow(mWindowHandle, SW_SHOW);
+	UpdateWindow(mWindowHandle);
+
+	mIsOpen = true;
 }
 
 void Window::ExecuteLists()

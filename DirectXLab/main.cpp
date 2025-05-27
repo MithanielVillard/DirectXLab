@@ -36,7 +36,6 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmd
 			cam.SetAspectRatio(w->GetAspectRatio());
 	});
 
-
 	while (window.IsOpen())
 	{
 		window.Update();
